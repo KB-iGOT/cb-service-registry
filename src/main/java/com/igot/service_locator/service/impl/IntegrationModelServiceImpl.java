@@ -47,7 +47,7 @@ public class IntegrationModelServiceImpl implements IntegrationModelService {
             serviceLocator = serviceLocatorFromDb.get();
             log.info("serviceLocator::isPreset");
             // Replace placeholders in the URL using the URL map
-            String resultantUrl = replaceUrlPlaceholders(serviceLocator, integrationModel.getUrlMap(), integrationModel);
+            String resultantUrl = replaceUrlPlaceholders(serviceLocator, integrationModel.getUrlMap());
             log.info("The url {} to call the service", resultantUrl);
             serviceLocator.setUrl(resultantUrl);
             return integrationFrameworkUtil.callExternalServiceApi(integrationModel, serviceLocator);
@@ -56,7 +56,7 @@ public class IntegrationModelServiceImpl implements IntegrationModelService {
 
     }
 
-    private String replaceUrlPlaceholders(ServiceLocatorEntity serviceLocator, Map<String, String> urlMap, IntegrationModel integrationModel) {
+    private String replaceUrlPlaceholders(ServiceLocatorEntity serviceLocator, Map<String, String> urlMap) {
         log.info("IntegrationModelServiceImpl::replaceUrlPlaceholders");
         String urlToModify = serviceLocator.getUrl();
         if (StringUtils.isNotBlank(serviceLocator.getUrlPlaceholder()) || !CollectionUtils.isEmpty(urlMap)) {
@@ -67,7 +67,7 @@ public class IntegrationModelServiceImpl implements IntegrationModelService {
             for (int i = 0; i < urlPlaceholderArr.length; i++) {
                 String placeholder = urlPlaceholderArr[i];
                 if (placeholder.equalsIgnoreCase("{hostAddress}")) {
-                    placeholderValue = integrationModel.getHostAddress();
+                    placeholderValue = serviceLocator.getHostAddress();
                 } else {
                     String placeholderWithoutCurlyBraces = placeholder.substring(1, placeholder.length() - 1);
                     if (urlMap.containsKey(placeholderWithoutCurlyBraces)) {

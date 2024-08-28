@@ -26,6 +26,11 @@ public class ServiceLocatorController {
         return serviceLocatorService.createOrUpdateServiceConfig(serviceLocatorEntity);
     }
 
+    @PostMapping("config/update")
+    public ServiceLocatorEntity updateServiceConfig(@RequestBody ServiceLocatorEntity serviceLocatorEntity) {
+        return serviceLocatorService.createOrUpdateServiceConfig(serviceLocatorEntity);
+    }
+
 
     @DeleteMapping("config/delete/{id}")
     public String deleteServiceConfig(@PathVariable String id) {
