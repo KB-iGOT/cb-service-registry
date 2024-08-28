@@ -9,8 +9,8 @@ import com.igot.service_locator.entity.IntegrationModel;
 import com.igot.service_locator.entity.ServiceLocatorEntity;
 import com.igot.service_locator.repository.CallExternalService;
 import com.igot.service_locator.config.IntegrationConfig;
-import com.igot.service_locator.security.ContentSource;
-import com.igot.service_locator.security.CornellAuth;
+import com.igot.service_locator.plugins.ContentSource;
+import com.igot.service_locator.plugins.cornell.CornellAuth;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,8 +38,6 @@ public class IntegrationFrameworkUtil {
     @Autowired
     private CallExternalService callExternalService;
 
-    @Value("${cornell.client.code}")
-    private String cornellClientCode;
 
     public Object callExternalServiceApi(
         IntegrationModel integrationModel, ServiceLocatorEntity serviceLocator) throws JsonProcessingException {
