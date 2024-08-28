@@ -1,4 +1,4 @@
-package com.igot.service_locator.security;
+package com.igot.service_locator.plugins;
 
 public enum ContentSource {
     CORNELL;
