@@ -1,2 +1,2 @@
-# cb-service-registry
-cb-service-registry
+# service-locator
+service-locator
