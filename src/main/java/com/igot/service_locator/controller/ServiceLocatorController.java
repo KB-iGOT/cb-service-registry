@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("serviceregistry/")
+@RequestMapping("serviceregistry")
 @Slf4j
 public class ServiceLocatorController {
 
@@ -21,24 +21,29 @@ public class ServiceLocatorController {
     private ServiceLocatorService serviceLocatorService;
 
 
-    @PostMapping("config/create")
+    @PostMapping("/config/create")
     public ServiceLocatorEntity createServiceConfig(@RequestBody ServiceLocatorEntity serviceLocatorEntity) {
         return serviceLocatorService.createOrUpdateServiceConfig(serviceLocatorEntity);
     }
 
+    @PostMapping("/config/update")
+    public ServiceLocatorEntity updateServiceConfig(@RequestBody ServiceLocatorEntity serviceLocatorEntity) {
+        return serviceLocatorService.createOrUpdateServiceConfig(serviceLocatorEntity);
+    }
 
-    @DeleteMapping("config/delete/{id}")
+
+    @DeleteMapping("/config/delete/{id}")
     public String deleteServiceConfig(@PathVariable String id) {
         serviceLocatorService.deleteServiceConfig(id);
         return "Data deleted successfully with id " + id;
     }
 
-    @PostMapping("config/search")
+    @PostMapping("/config/search")
     public List<ServiceLocatorEntity> searchServiceConfig(@RequestBody ServiceLocatorDto serviceLocatorDto) {
         return serviceLocatorService.searchServiceConfig(serviceLocatorDto);
     }
 
-    @PostMapping("config/fetch")
+    @PostMapping("/config/fetch")
     public ResponseEntity<?> getAllServiceConfig(@RequestBody RequestDto dto){
         return ResponseEntity.ok(serviceLocatorService.getAllServiceConfig(dto));
     }

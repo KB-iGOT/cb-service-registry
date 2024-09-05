@@ -67,6 +67,10 @@ public class ServiceLocatorEntity implements Serializable {
     @JsonProperty("urlSegment")
     private String urlSegment;
 
+    @Column(name = "host_address")
+    @JsonProperty("hostAddress")
+    private String hostAddress;
+
     public enum RequestMethod {
         GET("GET"),
         HEAD("HEAD"),
