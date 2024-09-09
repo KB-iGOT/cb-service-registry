@@ -101,11 +101,11 @@ public class IntegrationFrameworkUtil {
         ObjectNode reqHeaderNode = mapper.createObjectNode();
         reqHeaderNode.put("content-type", "*/*");
         if (serviceLocator.isSecureHeader()) {
-            if(integrationModel.getSecureVendorName()!=null) {
+            if(integrationModel.getVendorOrgId()!=null) {
                 String accessToken = "";
-                ContentSource contentSource = ContentSource.fromProviderName(integrationModel.getSecureVendorName());
+                ContentSource contentSource = ContentSource.fromOrgId(integrationModel.getVendorOrgId());
                 if (contentSource == null) {
-                    log.warn("Unknown provider name: " + integrationModel.getSecureVendorName());
+                    log.warn("Unknown provider name: " + integrationModel.getVendorOrgId());
                     return null;
                 }
                 switch (contentSource) {

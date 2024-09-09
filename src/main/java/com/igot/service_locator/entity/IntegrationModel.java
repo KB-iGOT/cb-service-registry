@@ -31,6 +31,6 @@ public class IntegrationModel {
     private long strictCacheTimeInMinutes;
     @JsonProperty("alwaysDataReadFromCache")
     private boolean alwaysDataReadFromCache;
-    @JsonProperty("secureVendorName")
-    private String secureVendorName;
+    @JsonProperty("vendorOrgId")
+    private String vendorOrgId;
 }
