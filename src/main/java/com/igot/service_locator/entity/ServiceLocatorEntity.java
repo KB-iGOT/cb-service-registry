@@ -7,7 +7,6 @@ import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
-
 import java.io.Serializable;
 import java.util.HashMap;
 
