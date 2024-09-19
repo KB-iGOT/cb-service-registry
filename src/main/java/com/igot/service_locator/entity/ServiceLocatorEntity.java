@@ -6,10 +6,7 @@ import lombok.*;
 import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.JsonValue;
-import org.hibernate.annotations.Filter;
-import org.hibernate.annotations.FilterDef;
-import org.hibernate.annotations.ParamDef;
-import org.hibernate.annotations.Where;
+
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -70,6 +67,10 @@ public class ServiceLocatorEntity implements Serializable {
     @Column(name = "host_address")
     @JsonProperty("hostAddress")
     private String hostAddress;
+
+    @Column(name = "is_formdata")
+    @JsonProperty("isFormData")
+    private boolean isFormData;
 
     public enum RequestMethod {
         GET("GET"),
