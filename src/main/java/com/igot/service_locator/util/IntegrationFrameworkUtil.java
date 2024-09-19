@@ -95,6 +95,7 @@ public class IntegrationFrameworkUtil {
     private ObjectNode createRequestObject(ServiceLocatorEntity serviceLocator, IntegrationModel integrationModel) {
         ObjectNode requestObject = mapper.createObjectNode();
         requestObject.put("url", serviceLocator.getUrl());
+        requestObject.put("isFormData", serviceLocator.isFormData());
         log.info("url {}",serviceLocator.getUrl());
         requestObject.put("requestMethod", serviceLocator.getRequestMethod().name());
         requestObject.put("operationType", serviceLocator.getOperationType());
