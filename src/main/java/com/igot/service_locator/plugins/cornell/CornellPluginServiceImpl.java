@@ -1,5 +1,7 @@
 package com.igot.service_locator.plugins.cornell;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.igot.service_locator.plugins.ContentPartnerPluginService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -10,7 +12,7 @@ import java.security.NoSuchAlgorithmException;
 
 @Component
 @Slf4j
-public class CornellAuth {
+public class CornellPluginServiceImpl  implements ContentPartnerPluginService {
 
     @Value("${cornell.client.code}")
     private String cornellClientCode;
@@ -18,7 +20,12 @@ public class CornellAuth {
     @Value("${cornell.client.secret}")
     private String cornellClientSecret;
 
-    public String generateAuthHeader(String urlSegment){
+    @Override
+    public String generateAuthHeader(JsonNode jsonNode) {
+            String urlSegment = jsonNode.get("urlSegment").asText();
+            if (jsonNode.get("urlSegment") == null) {
+                urlSegment = "";
+            }
         String timestamp = String.valueOf(System.currentTimeMillis());
         String toHash = urlSegment + cornellClientCode + timestamp + cornellClientSecret;
         MessageDigest md = null;

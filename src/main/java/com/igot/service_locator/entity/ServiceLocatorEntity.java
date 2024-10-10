@@ -1,11 +1,15 @@
 package com.igot.service_locator.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.*;
 
 import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.JsonValue;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -16,6 +20,7 @@ import java.util.HashMap;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 @Table(name = "service_locator")
 @Builder
 public class ServiceLocatorEntity implements Serializable {
@@ -70,6 +75,11 @@ public class ServiceLocatorEntity implements Serializable {
     @Column(name = "is_formdata")
     @JsonProperty("isFormData")
     private boolean isFormData;
+
+    @Column(columnDefinition = "jsonb")
+    @JsonProperty("requestPayload")
+    @Type(type = "jsonb")
+    private JsonNode requestPayload;
 
     public enum RequestMethod {
         GET("GET"),

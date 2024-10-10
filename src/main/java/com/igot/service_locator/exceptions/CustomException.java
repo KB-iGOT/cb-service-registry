@@ -8,15 +8,15 @@ import org.springframework.stereotype.Component;
 @Getter
 @Setter
 @Component
-public class ServiceLocatorException extends RuntimeException {
+public class CustomException extends RuntimeException {
     private String code;
     private String message;
     private HttpStatus httpStatusCode;
 
-    public ServiceLocatorException() {
+    public CustomException() {
     }
 
-    public ServiceLocatorException(String code, String message, HttpStatus httpStatusCode) {
+    public CustomException(String code, String message, HttpStatus httpStatusCode) {
         this.code = code;
         this.message = message;
         this.httpStatusCode = httpStatusCode;

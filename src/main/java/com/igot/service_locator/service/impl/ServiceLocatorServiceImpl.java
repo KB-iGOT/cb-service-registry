@@ -2,8 +2,8 @@ package com.igot.service_locator.service.impl;
 
 
 import com.igot.service_locator.dto.PaginatedResponse;
-import com.igot.service_locator.dto.RequestDto;
-import com.igot.service_locator.exceptions.ServiceLocatorException;
+import com.igot.service_locator.dto.PaginatedRequestDto;
+import com.igot.service_locator.exceptions.CustomException;
 import com.igot.service_locator.repository.ServiceLocatorRepository;
 import com.igot.service_locator.repository.rowMapper.ServiceLocatorMapper;
 import com.igot.service_locator.repository.rowMapper.ServiceLocatorQueryBuilder;
@@ -11,6 +11,7 @@ import com.igot.service_locator.dto.ServiceLocatorDto;
 import com.igot.service_locator.entity.ServiceLocatorEntity;
 
 import com.igot.service_locator.service.ServiceLocatorService;
+import com.igot.service_locator.util.Constants;
 import com.igot.service_locator.validator.ServiceLocatorValidator;
 import com.fasterxml.uuid.Generators;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -67,7 +67,7 @@ public class ServiceLocatorServiceImpl implements ServiceLocatorService {
         if (locatorEntity.getId() == null) {
             Optional<ServiceLocatorEntity> optSchemeDetails = serviceLocaterRepository.findByServiceCodeAndIsActiveTrue(locatorEntity.getServiceCode());
             if (optSchemeDetails.isPresent()) {
-                throw new ServiceLocatorException("SERVICE_CODE", "One service is already there in the system with service code : " + locatorEntity.getServiceCode() + " , " +
+                throw new CustomException("SERVICE_CODE", "One service is already there in the system with service code : " + locatorEntity.getServiceCode() + " , " +
                         "Please create a service config with unique service code", HttpStatus.BAD_REQUEST);
             }
             UUID uuid = Generators.timeBasedGenerator().generate();
@@ -105,7 +105,7 @@ public class ServiceLocatorServiceImpl implements ServiceLocatorService {
             redisTemplate.delete(redisKey);
             return "Data deleted successfully with id " + id;
         } else {
-            throw new ServiceLocatorException(ERROR_MESSAGE, "Data Not found to delete with given id " + id, HttpStatus.BAD_REQUEST);
+            throw new CustomException(ERROR_MESSAGE, "Data Not found to delete with given id " + id, HttpStatus.BAD_REQUEST);
         }
 
     }
@@ -118,7 +118,7 @@ public class ServiceLocatorServiceImpl implements ServiceLocatorService {
                 && StringUtils.isBlank(searchCriteria.getServiceCode())
                 && StringUtils.isBlank(searchCriteria.getServiceName())
                 && StringUtils.isBlank(searchCriteria.getOperationType())) {
-            throw new ServiceLocatorException("SEARCH_CRITERIA", "One search criteria must be provided.", HttpStatus.BAD_REQUEST);
+            throw new CustomException("SEARCH_CRITERIA", "One search criteria must be provided.", HttpStatus.BAD_REQUEST);
         }
 
         List<Object> preparedStmtList = new ArrayList<>();
@@ -127,14 +127,14 @@ public class ServiceLocatorServiceImpl implements ServiceLocatorService {
         List<ServiceLocatorEntity> serviceLocatorEntityList = jdbcTemplate.query(query, locatorMapper, preparedStmtList.toArray());
 
         if (CollectionUtils.isEmpty(serviceLocatorEntityList)) {
-            throw new ServiceLocatorException(ERROR_MESSAGE, "No data available for the search result", HttpStatus.BAD_REQUEST);
+            throw new CustomException(ERROR_MESSAGE, "No data available for the search result", HttpStatus.BAD_REQUEST);
         }
         return serviceLocatorEntityList;
     }
 
 
     @Override
-    public PaginatedResponse getAllServiceConfig(RequestDto dto) {
+    public PaginatedResponse getAllServiceConfig(PaginatedRequestDto dto) {
         try {
             Pageable pageable = PageRequest.of(dto.getOffset(), dto.getLimit());
             Page<Object> pageData = null;
@@ -149,9 +149,23 @@ public class ServiceLocatorServiceImpl implements ServiceLocatorService {
             );
         } catch (DataAccessException dae) {
             log.error("Database access error while fetching content", dae.getMessage());
-            throw new ServiceLocatorException("ERROR", "Database access error: " + dae.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new CustomException(Constants.ERROR, "Database access error: " + dae.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
-            throw new ServiceLocatorException("ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new CustomException(Constants.ERROR, e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Override
+    public ServiceLocatorEntity readServiceConfig(String id) {
+        try {
+            Optional<ServiceLocatorEntity> optionalServiceLocator = serviceLocaterRepository.findById(id);
+            if (optionalServiceLocator.isPresent()) {
+                return optionalServiceLocator.get();
+            } else {
+                throw new CustomException(Constants.ERROR, "Data not present in Db with given Id ", HttpStatus.BAD_REQUEST);
+            }
+        } catch (Exception e) {
+            throw new CustomException(Constants.ERROR, e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
