@@ -16,8 +16,8 @@ public class RestExceptionHandling {
         log.debug("RestExceptionHandler::handleException::" + ex);
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
         ErrorResponse errorResponse = null;
-        if (ex instanceof ServiceLocatorException) {
-            ServiceLocatorException CustomException = (ServiceLocatorException) ex;
+        if (ex instanceof CustomException) {
+            CustomException CustomException = (com.igot.service_locator.exceptions.CustomException) ex;
             status = HttpStatus.BAD_REQUEST;
             // Check if the CustomException provides an HTTP status code
             if (CustomException != null) {

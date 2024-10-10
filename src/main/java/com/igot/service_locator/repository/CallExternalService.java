@@ -4,7 +4,8 @@ package com.igot.service_locator.repository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.igot.service_locator.exceptions.ServiceLocatorException;
+import com.igot.service_locator.exceptions.CustomException;
+import com.igot.service_locator.util.Constants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
@@ -35,10 +36,10 @@ public class CallExternalService {
 
         } catch (HttpClientErrorException e) {
             log.error("External Service threw an Exception: {}", e);
-            throw new ServiceLocatorException("EXTERNAL_SERVICE_CALL_EXCEPTION", e.getResponseBodyAsString(),HttpStatus.BAD_REQUEST);
+            throw new CustomException(Constants.EXTERNAL_SERVICE_CALL_EXCEPTION, e.getResponseBodyAsString(),HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             log.error("Exception while fetching from searcher: {}", e);
-            throw new ServiceLocatorException("EXTERNAL_SERVICE_CALL_EXCEPTION", e.getMessage(),HttpStatus.BAD_REQUEST);
+            throw new CustomException(Constants.EXTERNAL_SERVICE_CALL_EXCEPTION, e.getMessage(),HttpStatus.BAD_REQUEST);
         }
 
         return response;
@@ -55,7 +56,7 @@ public class CallExternalService {
 
         } catch (HttpClientErrorException e) {
             log.error("External Service threw an Exception: {}", e);
-            throw new ServiceLocatorException("EXTERNAL_SERVICE_CALL_EXCEPTION", e.getResponseBodyAsString(),HttpStatus.BAD_REQUEST);
+            throw new CustomException(Constants.EXTERNAL_SERVICE_CALL_EXCEPTION, e.getResponseBodyAsString(),HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             log.error("Exception while fetching from searcher: {}", e);
         }

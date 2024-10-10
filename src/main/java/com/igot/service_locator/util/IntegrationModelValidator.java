@@ -4,7 +4,7 @@ import com.igot.service_locator.entity.IntegrationModel;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.igot.service_locator.exceptions.ServiceLocatorException;
+import com.igot.service_locator.exceptions.CustomException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,11 +32,11 @@ public class IntegrationModelValidator {
 
             }
             if (!isValidJson) {
-                throw new ServiceLocatorException("REQUEST_BODY", "Request body is not a valid json object",HttpStatus.BAD_REQUEST);
+                throw new CustomException("REQUEST_BODY", "Request body is not a valid json object",HttpStatus.BAD_REQUEST);
             }
         }
         if (StringUtils.isBlank(integrationModel.getServiceCode())) {
-            throw new ServiceLocatorException("SERVICE_CODE", "Service Code is missing in the request", HttpStatus.BAD_REQUEST);
+            throw new CustomException("SERVICE_CODE", "Service Code is missing in the request", HttpStatus.BAD_REQUEST);
         }
     }
 }

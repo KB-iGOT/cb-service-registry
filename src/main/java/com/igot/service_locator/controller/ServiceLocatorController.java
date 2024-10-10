@@ -1,12 +1,11 @@
 package com.igot.service_locator.controller;
 
-import com.igot.service_locator.dto.RequestDto;
+import com.igot.service_locator.dto.PaginatedRequestDto;
 import com.igot.service_locator.dto.ServiceLocatorDto;
 import com.igot.service_locator.entity.ServiceLocatorEntity;
 import com.igot.service_locator.service.ServiceLocatorService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -44,8 +43,13 @@ public class ServiceLocatorController {
     }
 
     @PostMapping("/config/fetch")
-    public ResponseEntity<?> getAllServiceConfig(@RequestBody RequestDto dto){
+    public ResponseEntity<?> getAllServiceConfig(@RequestBody PaginatedRequestDto dto){
         return ResponseEntity.ok(serviceLocatorService.getAllServiceConfig(dto));
+    }
+
+    @GetMapping("/config/read/{id}")
+    public ResponseEntity<?> readServiceConfig(@PathVariable String id) {
+        return ResponseEntity.ok(serviceLocatorService.readServiceConfig(id));
     }
 
 
