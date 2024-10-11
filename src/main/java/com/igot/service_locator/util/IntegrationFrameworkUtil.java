@@ -30,9 +30,6 @@ public class IntegrationFrameworkUtil {
     private IntegrationConfig config;
 
     @Autowired
-    CornellPluginServiceImpl cornellAuth;
-
-    @Autowired
     private ObjectMapper mapper;
 
     @Autowired
