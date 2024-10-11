@@ -69,6 +69,7 @@ public class IntegrationModelServiceImpl implements IntegrationModelService {
                 JsonNode jsonNode = optionalServiceLocator.get().getRequestPayload();
                 if (!jsonNode.isMissingNode()) {
                     IntegrationModel model = replacePlaceholders(jsonNode, serviceRequestDto);
+                    log.debug("model::{}", model);
                     return getDetailsFromExternalService(model);
                 } else {
                     throw new CustomException(Constants.ERROR, "requestDto not present in Db with given Id ", HttpStatus.BAD_REQUEST);
@@ -83,18 +84,20 @@ public class IntegrationModelServiceImpl implements IntegrationModelService {
     private IntegrationModel replacePlaceholders(JsonNode model, ServiceRequestDto serviceRequestDto) {
         log.debug("Replacing placeholders in requestDto");
         try {
-            // Replace placeholders in the requestBody with values from urlMap, requestMap, and headerMap
-            if (serviceRequestDto.getRequestMap() != null && !serviceRequestDto.getRequestMap().isEmpty()) {
-                ObjectNode requestBody = (ObjectNode) model.path("requestBody");
-                replacePlaceholdersInMap(requestBody, serviceRequestDto.getRequestMap());
-            }
-            if (serviceRequestDto.getUrlMap() != null && !serviceRequestDto.getUrlMap().isEmpty()) {
-                ObjectNode requestBody = (ObjectNode) model.path("urlMap");
-                replacePlaceholdersInMap(requestBody, serviceRequestDto.getUrlMap());
-            }
-            if (serviceRequestDto.getHeaderMap() != null && !serviceRequestDto.getHeaderMap().isEmpty()) {
-                ObjectNode requestBody = (ObjectNode) model.path("headerMap");
-                replacePlaceholdersInMap(requestBody, serviceRequestDto.getHeaderMap());
+            if(serviceRequestDto!=null) {
+                // Replace placeholders in the requestBody with values from urlMap, requestMap, and headerMap
+                if (serviceRequestDto.getRequestMap() != null && !serviceRequestDto.getRequestMap().isEmpty()) {
+                    ObjectNode requestBody = (ObjectNode) model.path("requestBody");
+                    replacePlaceholdersInMap(requestBody, serviceRequestDto.getRequestMap());
+                }
+                if (serviceRequestDto.getUrlMap() != null && !serviceRequestDto.getUrlMap().isEmpty()) {
+                    ObjectNode requestBody = (ObjectNode) model.path("urlMap");
+                    replacePlaceholdersInMap(requestBody, serviceRequestDto.getUrlMap());
+                }
+                if (serviceRequestDto.getHeaderMap() != null && !serviceRequestDto.getHeaderMap().isEmpty()) {
+                    ObjectNode requestBody = (ObjectNode) model.path("headerMap");
+                    replacePlaceholdersInMap(requestBody, serviceRequestDto.getHeaderMap());
+                }
             }
             return mapper.treeToValue(model, IntegrationModel.class);
         } catch (Exception e) {
@@ -110,7 +113,7 @@ public class IntegrationModelServiceImpl implements IntegrationModelService {
                 String placeholder = "{" + key + "}";
                 if (fieldValue.contains(placeholder)) {
                     // Replace placeholder with the actual value
-                    requestBody.put(field.getKey(), fieldValue.replace(placeholder, value.toString()));
+                    requestBody.put(field.getKey(), fieldValue.replace(placeholder, value));
                 }
             });
         });

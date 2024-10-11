@@ -12,6 +12,7 @@ import java.util.Map;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@ToString
 public class IntegrationModel {
     @JsonProperty("requestBody")
     private JsonNode requestBody;

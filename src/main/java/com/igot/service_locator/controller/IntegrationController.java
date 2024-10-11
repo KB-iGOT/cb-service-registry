@@ -6,8 +6,6 @@ import com.igot.service_locator.service.IntegrationModelService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
 @RestController
@@ -23,7 +21,7 @@ public class IntegrationController {
         return service.getDetailsFromExternalService(integrationModel);
     }
     @PostMapping("/v1/callExternalApi/{id}")
-    public Object callExternalApiServiceByConfigId(@RequestBody ServiceRequestDto requestDto, @PathVariable String id) throws IOException {
+    public Object callExternalApiServiceByConfigId(@RequestBody(required = false) ServiceRequestDto requestDto, @PathVariable String id) throws IOException {
         return service.getRequestPayloadByConfigId(requestDto,id);
     }
 }
