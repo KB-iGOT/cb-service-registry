@@ -20,7 +20,7 @@ public class IntegrationController {
     public Object callExternalApiService(@RequestBody IntegrationModel integrationModel) throws IOException {
         return service.getDetailsFromExternalService(integrationModel);
     }
-    @PostMapping("/v1/callExternalApi/{id}")
+    @PostMapping("/v1/callExternalApiById/{id}")
     public Object callExternalApiServiceByConfigId(@RequestBody(required = false) ServiceRequestDto requestDto, @PathVariable String id) throws IOException {
         return service.getRequestPayloadByConfigId(requestDto,id);
     }
