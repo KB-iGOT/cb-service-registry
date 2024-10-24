@@ -68,31 +68,6 @@ public class IntegrationFrameworkUtil {
         return responseObject;
     }
 
-    // Method to perform Jolt transformation on the response
-    public Object transformData(Object source, List<Object> responseFormat) throws JsonProcessingException {
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        String inputJson = "";
-        Object transformedOutput;
-        try {
-            inputJson = objectMapper.writeValueAsString(source);
-
-            Chainr chainr = Chainr.fromSpec(responseFormat);
-            transformedOutput = chainr.transform(JsonUtils.jsonToObject(inputJson));
-
-            return transformedOutput;
-
-        } catch (Exception e) {
-            ObjectNode response = mapper.createObjectNode();
-            ObjectNode errorMessage = objectMapper.createObjectNode();
-            errorMessage.put("message", "Jolt Transformation Spec Error, Check in responseFormat");
-            ObjectNode extResponse = objectMapper.valueToTree(source);
-            response.set("error", errorMessage);
-            response.set("response", extResponse);
-            return response;
-        }
-    }
-
     private ObjectNode mergeHeaders(ObjectNode secureHeader, ObjectNode reqHeader) {
         ObjectNode mergedHeader = mapper.createObjectNode();
         mergedHeader.setAll(secureHeader);

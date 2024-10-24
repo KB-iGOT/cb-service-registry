@@ -78,6 +78,7 @@ public class ServiceLocatorServiceImpl implements ServiceLocatorService {
             ServiceLocatorEntity serviceLocatorEntity = serviceLocaterRepository.save(locatorEntity);
             // Save to Redis
             redisTemplate.opsForValue().set(SERVICE_LOCATOR_KEY + serviceLocatorEntity.getServiceCode(), serviceLocatorEntity, Duration.ofMinutes(cacheDataTtl));
+            redisTemplate.opsForValue().set(SERVICE_LOCATOR_KEY + serviceLocatorEntity.getId(), serviceLocatorEntity, Duration.ofMinutes(cacheDataTtl));
             return serviceLocatorEntity;
         }else{
             Optional<ServiceLocatorEntity> optSchemeDetails = serviceLocaterRepository.findById(locatorEntity.getId());
@@ -86,6 +87,7 @@ public class ServiceLocatorServiceImpl implements ServiceLocatorService {
                 // Copy the property values from updatedSchemeDetails to schemeDetails, Exclude the "id" fields from being copied
                 BeanUtils.copyProperties(locatorEntity, batchService, "id");
                 redisTemplate.opsForValue().set(SERVICE_LOCATOR_KEY + batchService.getServiceCode(), batchService, Duration.ofMinutes(cacheDataTtl));
+                redisTemplate.opsForValue().set(SERVICE_LOCATOR_KEY + batchService.getId(), batchService, Duration.ofMinutes(cacheDataTtl));
                 return serviceLocaterRepository.save(batchService);
             }
         }
@@ -95,14 +97,16 @@ public class ServiceLocatorServiceImpl implements ServiceLocatorService {
     @Override
     public String deleteServiceConfig(String id) {
 
-        Optional<ServiceLocatorEntity> dataFromDb = serviceLocaterRepository.findById(id, true);
+        Optional<ServiceLocatorEntity> dataFromDb = serviceLocaterRepository.findById(id);
         if (dataFromDb.isPresent()) {
             ServiceLocatorEntity entity = dataFromDb.get();
             entity.setActive(false);
             serviceLocaterRepository.save(entity);
             String serviceCode = entity.getServiceCode();
-            String redisKey = SERVICE_LOCATOR_KEY + serviceCode;
-            redisTemplate.delete(redisKey);
+            String redisKeyServiceCode = SERVICE_LOCATOR_KEY + serviceCode;
+            String redisKeyId = SERVICE_LOCATOR_KEY + entity.getId();
+            redisTemplate.delete(redisKeyServiceCode);
+            redisTemplate.delete(redisKeyId);
             return "Data deleted successfully with id " + id;
         } else {
             throw new CustomException(ERROR_MESSAGE, "Data Not found to delete with given id " + id, HttpStatus.BAD_REQUEST);
@@ -156,13 +160,43 @@ public class ServiceLocatorServiceImpl implements ServiceLocatorService {
     }
 
     @Override
-    public ServiceLocatorEntity readServiceConfig(String id) {
+    public ServiceLocatorEntity readServiceConfig(String id,boolean isActive) {
+        String cacheKey = SERVICE_LOCATOR_KEY + id;
+        ServiceLocatorEntity cachedServiceLocator = (ServiceLocatorEntity) redisTemplate.opsForValue().get(cacheKey);
+        if (cachedServiceLocator != null) {
+            log.info("Config data reading from cache");
+            return cachedServiceLocator;
+        }
         try {
-            Optional<ServiceLocatorEntity> optionalServiceLocator = serviceLocaterRepository.findById(id);
+            Optional<ServiceLocatorEntity> optionalServiceLocator = serviceLocaterRepository.findByIdAndIsActive(id, isActive);
             if (optionalServiceLocator.isPresent()) {
-                return optionalServiceLocator.get();
+                ServiceLocatorEntity serviceLocatorEntity = optionalServiceLocator.get();
+                redisTemplate.opsForValue().set(cacheKey, serviceLocatorEntity, Duration.ofMinutes(cacheDataTtl));
+                return serviceLocatorEntity;
             } else {
-                throw new CustomException(Constants.ERROR, "Data not present in Db with given Id ", HttpStatus.BAD_REQUEST);
+                throw new CustomException(Constants.ERROR, "Data not present in Db with given Id", HttpStatus.BAD_REQUEST);
+            }
+        } catch (Exception e) {
+            throw new CustomException(Constants.ERROR, e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Override
+    public ServiceLocatorEntity readServiceConfigByServiceCode(String serviceCode) {
+        String cacheKey = SERVICE_LOCATOR_KEY + serviceCode;
+        ServiceLocatorEntity cachedServiceLocator = (ServiceLocatorEntity) redisTemplate.opsForValue().get(cacheKey);
+        if (cachedServiceLocator != null) {
+            log.info("Config data reading from cache");
+            return cachedServiceLocator;
+        }
+        try {
+            Optional<ServiceLocatorEntity> optionalServiceLocator = serviceLocaterRepository.findByServiceCodeAndIsActiveTrue(serviceCode);
+            if (optionalServiceLocator.isPresent()) {
+                ServiceLocatorEntity serviceLocatorEntity = optionalServiceLocator.get();
+                redisTemplate.opsForValue().set(cacheKey, serviceLocatorEntity, Duration.ofMinutes(cacheDataTtl));
+                return serviceLocatorEntity;
+            } else {
+                throw new CustomException(Constants.ERROR, "Service code is not configured in our system, please configure it first "+serviceCode, HttpStatus.BAD_REQUEST);
             }
         } catch (Exception e) {
             throw new CustomException(Constants.ERROR, e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
