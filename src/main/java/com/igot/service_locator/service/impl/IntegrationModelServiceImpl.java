@@ -57,6 +57,8 @@ public class IntegrationModelServiceImpl implements IntegrationModelService {
         }catch (Exception e) {
             throw new CustomException(Constants.ERROR, e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+        throw new CustomException("SERVICE_CODE", "Service code is not configured in our system, please configure it first", HttpStatus.BAD_REQUEST);
+
     }
 
     @Override
