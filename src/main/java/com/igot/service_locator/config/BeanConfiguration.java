@@ -13,9 +13,4 @@ public class BeanConfiguration {
     RestTemplate getRestTemplate() {
         return new RestTemplate();
     }
-
-//    @Bean
-//    RedisTemplate redisTemplate() {
-//        return new RedisTemplate<>();
-//    }
 }

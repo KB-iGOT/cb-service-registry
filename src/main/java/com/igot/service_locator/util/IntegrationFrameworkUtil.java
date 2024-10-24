@@ -3,17 +3,20 @@ package com.igot.service_locator.util;
 import com.bazaarvoice.jolt.Chainr;
 import com.bazaarvoice.jolt.JsonUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.igot.service_locator.entity.IntegrationModel;
 import com.igot.service_locator.entity.ServiceLocatorEntity;
+import com.igot.service_locator.plugins.ContentPartnerPluginService;
+import com.igot.service_locator.plugins.config.ContentPartnerServiceFactory;
 import com.igot.service_locator.repository.CallExternalService;
 import com.igot.service_locator.config.IntegrationConfig;
 import com.igot.service_locator.plugins.ContentSource;
-import com.igot.service_locator.plugins.cornell.CornellAuth;
+import com.igot.service_locator.plugins.cornell.CornellPluginServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import java.util.*;
@@ -27,16 +30,16 @@ public class IntegrationFrameworkUtil {
     private IntegrationConfig config;
 
     @Autowired
-    CornellAuth cornellAuth;
-
-    @Autowired
-    private RedisTemplate<String,String> redisTemplate;
-
-    @Autowired
     private ObjectMapper mapper;
 
     @Autowired
     private CallExternalService callExternalService;
+
+    @Autowired
+    private DataTransformUtility dataTransformUtility;
+
+    @Autowired
+    private ContentPartnerServiceFactory contentPartnerServiceFactory;
 
 
     public Object callExternalServiceApi(
@@ -48,42 +51,21 @@ public class IntegrationFrameworkUtil {
         Object responseObject = callExternalService.fetchResult(getIntegrationFrameWorkUrl(), requestObject);
         log.info("Got successful response from external system service");
 
-        if (integrationModel.getResponseFormat() != null) {
-            Object FormattedData = transformData(responseObject, integrationModel.getResponseFormat());
-            if (FormattedData != null) {
-
-                return FormattedData;
-            } else {
-                return responseObject;
+        if (integrationModel.getPartnerCode() != null) {
+            JsonNode response = dataTransformUtility.callContentPartnerReadAPIByPartnerCode(integrationModel.getPartnerCode());
+            if (!response.path("trasformContentJson").isMissingNode()) {
+                List<Object> contentJson = mapper.convertValue(response.get("trasformContentJson"), new TypeReference<List<Object>>() {});
+                Object transformData = dataTransformUtility.transformData(responseObject, contentJson);
+                if (transformData != null) {
+                    return transformData;
+                } else {
+                    return responseObject;
+                }
             }
         } else {
             return responseObject;
         }
-    }
-
-    // Method to perform Jolt transformation on the response
-    public Object transformData(Object source, List<Object> responseFormat) throws JsonProcessingException {
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        String inputJson = "";
-        Object transformedOutput;
-        try {
-            inputJson = objectMapper.writeValueAsString(source);
-
-            Chainr chainr = Chainr.fromSpec(responseFormat);
-            transformedOutput = chainr.transform(JsonUtils.jsonToObject(inputJson));
-
-            return transformedOutput;
-
-        } catch (Exception e) {
-            ObjectNode response = mapper.createObjectNode();
-            ObjectNode errorMessage = objectMapper.createObjectNode();
-            errorMessage.put("message", "Jolt Transformation Spec Error, Check in responseFormat");
-            ObjectNode extResponse = objectMapper.valueToTree(source);
-            response.set("error", errorMessage);
-            response.set("response", extResponse);
-            return response;
-        }
+        return responseObject;
     }
 
     private ObjectNode mergeHeaders(ObjectNode secureHeader, ObjectNode reqHeader) {
@@ -102,18 +84,15 @@ public class IntegrationFrameworkUtil {
         ObjectNode reqHeaderNode = mapper.createObjectNode();
         reqHeaderNode.put("content-type", "*/*");
         if (serviceLocator.isSecureHeader()) {
-            if(integrationModel.getVendorOrgId()!=null) {
+            if (integrationModel.getPartnerCode() != null) {
                 String accessToken = "";
-                ContentSource contentSource = ContentSource.fromOrgId(integrationModel.getVendorOrgId());
-                if (contentSource == null) {
-                    log.warn("Unknown provider name: " + integrationModel.getVendorOrgId());
-                    return null;
-                }
-                switch (contentSource) {
-                    case CORNELL:
-                        accessToken = cornellAuth.generateAuthHeader(serviceLocator.getUrlSegment());
-                        reqHeaderNode.put("Authorization", accessToken);
-                        break;
+                ContentSource contentSource = ContentSource.fromPartnerCode(integrationModel.getPartnerCode());
+                if (contentSource != null) {
+                    ContentPartnerPluginService service = contentPartnerServiceFactory.getContentPartnerPluginService(contentSource);
+                    JsonNode jsonNode=mapper.createObjectNode();
+                    ((ObjectNode)jsonNode).put("urlSegment",serviceLocator.getUrlSegment());
+                    accessToken=service.generateAuthHeader(jsonNode);
+                    reqHeaderNode.put("Authorization", accessToken);
                 }
             }
             ObjectNode secureHeader = reqHeaderNode;

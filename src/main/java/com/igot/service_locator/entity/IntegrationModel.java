@@ -12,6 +12,7 @@ import java.util.Map;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@ToString
 public class IntegrationModel {
     @JsonProperty("requestBody")
     private JsonNode requestBody;
@@ -25,12 +26,12 @@ public class IntegrationModel {
     private Map<String, String> headerMap;
     @JsonProperty("hostAddress")
     private String hostAddress;
-    @JsonProperty("responseFormat")
-    private List<Object> responseFormat;
     @JsonProperty("strictCacheTimeInMinutes")
     private long strictCacheTimeInMinutes;
     @JsonProperty("alwaysDataReadFromCache")
     private boolean alwaysDataReadFromCache;
-    @JsonProperty("vendorOrgId")
-    private String vendorOrgId;
+    @JsonProperty("partnerCode")
+    private String partnerCode;
+    @JsonProperty("transformJson")
+    private List<Object> transformJson;
 }

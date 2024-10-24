@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class RequestDto {
+public class PaginatedRequestDto {
     private int offset;
     private int limit;
     private Boolean isActive;

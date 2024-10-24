@@ -1,14 +1,17 @@
 package com.igot.service_locator.plugins;
 
 public enum ContentSource {
-    CORNELL;
-
-    public static ContentSource fromOrgId(String orgId) {
-        switch (orgId) {
-            case "G00345":
-                return CORNELL;
-            default:
-                throw new RuntimeException("Unknown org id: " + orgId);
+    CORNELL("${cornell.partner.code}");
+    private String value;
+    ContentSource(String value) {
+        this.value = value;
+    }
+    public static ContentSource fromPartnerCode(String text) {
+        for (ContentSource b : ContentSource.values()) {
+            if (String.valueOf(b).equals(text)) {
+                return b;
+            }
         }
+        return null;
     }
 }
