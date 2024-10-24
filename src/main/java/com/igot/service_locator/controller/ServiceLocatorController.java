@@ -48,8 +48,8 @@ public class ServiceLocatorController {
     }
 
     @GetMapping("/config/read/{id}")
-    public ResponseEntity<?> readServiceConfig(@PathVariable String id) {
-        return ResponseEntity.ok(serviceLocatorService.readServiceConfig(id));
+    public ResponseEntity<?> readServiceConfig(@PathVariable String id, @RequestParam(value = "isActive", defaultValue = "true") boolean isActive) {
+        return ResponseEntity.ok(serviceLocatorService.readServiceConfig(id, isActive));
     }
 
 
