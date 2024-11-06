@@ -89,9 +89,10 @@ public class ServiceLocatorServiceImpl implements ServiceLocatorService {
                 redisTemplate.opsForValue().set(SERVICE_LOCATOR_KEY + batchService.getServiceCode(), batchService, Duration.ofMinutes(cacheDataTtl));
                 redisTemplate.opsForValue().set(SERVICE_LOCATOR_KEY + batchService.getId(), batchService, Duration.ofMinutes(cacheDataTtl));
                 return serviceLocaterRepository.save(batchService);
+            }else{
+                throw new CustomException(ERROR_MESSAGE, "Data not present in Db with given Id", HttpStatus.BAD_REQUEST);
             }
         }
-        return null;
     }
 
     @Override
