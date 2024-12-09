@@ -58,19 +58,11 @@ public class ServiceLocatorEntity implements Serializable {
 
     @Column(name = "is_active")
     @JsonProperty("isActive")
-    private boolean isActive;
+    private boolean isActive=true;
 
     @Column(name = "is_secure_header")
     @JsonProperty("isSecureHeader")
     private boolean isSecureHeader=true;
-
-    @Column(name = "url_segment")
-    @JsonProperty("urlSegment")
-    private String urlSegment;
-
-    @Column(name = "host_address")
-    @JsonProperty("hostAddress")
-    private String hostAddress;
 
     @Column(name = "is_formdata")
     @JsonProperty("isFormData")
@@ -80,6 +72,10 @@ public class ServiceLocatorEntity implements Serializable {
     @JsonProperty("requestPayload")
     @Type(type = "jsonb")
     private JsonNode requestPayload;
+
+    @Column(name = "partner_code")
+    @JsonProperty("partnerCode")
+    private String partnerCode;
 
     public enum RequestMethod {
         GET("GET"),

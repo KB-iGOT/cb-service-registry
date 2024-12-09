@@ -1,7 +1,8 @@
 package com.igot.service_locator.plugins;
 
 public enum ContentSource {
-    CORNELL("${cornell.partner.code}");
+    CORNELL("${cornell.partner.code}"),
+    COURSERA("${coursera.partner.code}");
     private String value;
     ContentSource(String value) {
         this.value = value;
