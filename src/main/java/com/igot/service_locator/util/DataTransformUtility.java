@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.igot.service_locator.config.IntegrationConfig;
 import com.igot.service_locator.exceptions.CustomException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,9 @@ import java.util.List;
 @Component
 @Slf4j
 public class DataTransformUtility {
+
+    @Autowired
+    private IntegrationConfig config;
     @Autowired
     private RestTemplate restTemplate;
     @Autowired
@@ -26,7 +30,7 @@ public class DataTransformUtility {
     private ObjectMapper mapper;
     public JsonNode callContentPartnerReadAPIByPartnerCode(String partnerCode) {
         try{
-        log.info("DataTransformUtility :: callContentPartnerReadAPIByPartnerCode");
+        log.info("DataTransformUtility :: callContentPartnerReadAPIByPartnerCode {}",partnerCode);
         String url = cbServerProperties.getContentPartnerBaseUrl() + cbServerProperties.getContentPartnerReadApiUrl() + partnerCode;
         HttpHeaders headers = new HttpHeaders();
         HttpEntity<String> entity = new HttpEntity<>(headers);
@@ -63,5 +67,11 @@ public class DataTransformUtility {
             response.set("response", extResponse);
             return response;
         }
+    }
+
+    public StringBuilder getIntegrationFrameWorkUrl() {
+        StringBuilder uriBuilder = new StringBuilder();
+        return (uriBuilder.append(config.getIntegrationFwHost())
+                .append(config.getIntegrationFwPath()));
     }
 }
