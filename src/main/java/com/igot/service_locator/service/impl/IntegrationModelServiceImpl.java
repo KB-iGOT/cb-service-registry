@@ -69,6 +69,8 @@ public class IntegrationModelServiceImpl implements IntegrationModelService {
             JsonNode jsonNode = serviceLocatorEntity.getRequestPayload();
             if (!jsonNode.isMissingNode()) {
                 IntegrationModel model = replaceServiceRequestDtoPlaceholders(jsonNode, serviceRequestDto);
+                model.setServiceCode(serviceLocatorEntity.getServiceCode());
+                model.setPartnerCode(serviceLocatorEntity.getPartnerCode());
                 log.debug("model::{}", model);
                 return getDetailsFromExternalService(model);
             } else {
@@ -127,9 +129,9 @@ public class IntegrationModelServiceImpl implements IntegrationModelService {
             String placeholderValue = null;
             for (int i = 0; i < urlPlaceholderArr.length; i++) {
                 String placeholder = urlPlaceholderArr[i];
-                if (placeholder.equalsIgnoreCase("{hostAddress}")) {
-                    placeholderValue = serviceLocator.getHostAddress();
-                } else {
+//                if (placeholder.equalsIgnoreCase("{hostAddress}")) {
+//                    placeholderValue = serviceLocator.getHostAddress();
+//                } else {
                     String placeholderWithoutCurlyBraces = placeholder.substring(1, placeholder.length() - 1);
                     if (urlMap.containsKey(placeholderWithoutCurlyBraces)) {
                         String value = urlMap.get(placeholderWithoutCurlyBraces);
@@ -139,7 +141,7 @@ public class IntegrationModelServiceImpl implements IntegrationModelService {
                     } else {
                         placeholderValue = ""; // Assign an empty value if the field is not present in urlMap
                     }
-                }
+//                }
                 if (placeholderValue != null) {
                     urlToModify = urlToModify.replace(placeholder, placeholderValue);
                 } else {
