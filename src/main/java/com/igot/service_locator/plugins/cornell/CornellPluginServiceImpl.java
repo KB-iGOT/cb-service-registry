@@ -2,32 +2,30 @@ package com.igot.service_locator.plugins.cornell;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.igot.service_locator.plugins.ContentPartnerPluginService;
+import com.igot.service_locator.util.CbServerProperties;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-@Component
+@Service
 @Slf4j
 public class CornellPluginServiceImpl  implements ContentPartnerPluginService {
 
-    @Value("${cornell.client.code}")
-    private String cornellClientCode;
-
-    @Value("${cornell.client.secret}")
-    private String cornellClientSecret;
+    @Autowired
+    private CbServerProperties cbServerProperties;
 
     @Override
-    public String generateAuthHeader(JsonNode jsonNode) {
-            String urlSegment = jsonNode.get("urlSegment").asText();
-            if (jsonNode.get("urlSegment") == null) {
-                urlSegment = "";
-            }
+    public String generateAuthHeader() {
+        log.info("CornellPluginServiceImpl::generateAuthHeader");
+        String urlSegment = cbServerProperties.getCornellUrlSegment();
         String timestamp = String.valueOf(System.currentTimeMillis());
-        String toHash = urlSegment + cornellClientCode + timestamp + cornellClientSecret;
+        String toHash = urlSegment + cbServerProperties.getCornellClientCode() + timestamp + cbServerProperties.getCornellClientSecret();
         MessageDigest md = null;
         try {
             md = MessageDigest.getInstance("MD5");
@@ -45,6 +43,6 @@ public class CornellPluginServiceImpl  implements ContentPartnerPluginService {
             hashString.append(String.format("%02x", b));
         }
         String authHash = hashString.toString();
-        return cornellClientCode + "." + timestamp + "." + authHash;
+        return cbServerProperties.getCornellClientCode() + "." + timestamp + "." + authHash;
     }
 }

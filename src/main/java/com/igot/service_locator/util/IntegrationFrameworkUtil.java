@@ -41,6 +41,9 @@ public class IntegrationFrameworkUtil {
     @Autowired
     private ContentPartnerServiceFactory contentPartnerServiceFactory;
 
+    @Autowired
+    private CbServerProperties cbServerProperties;
+
 
     public Object callExternalServiceApi(
         IntegrationModel integrationModel, ServiceLocatorEntity serviceLocator) throws JsonProcessingException {
@@ -48,13 +51,13 @@ public class IntegrationFrameworkUtil {
         ObjectNode requestObject = this.createRequestObject(serviceLocator, integrationModel);
         log.info("IntegrationFrameworkUtil::requestObject {} ", requestObject);
 
-        Object responseObject = callExternalService.fetchResult(getIntegrationFrameWorkUrl(), requestObject);
+        Object responseObject = callExternalService.fetchResult(dataTransformUtility.getIntegrationFrameWorkUrl(), requestObject);
         log.info("Got successful response from external system service");
 
         if (integrationModel.getPartnerCode() != null) {
             JsonNode response = dataTransformUtility.callContentPartnerReadAPIByPartnerCode(integrationModel.getPartnerCode());
             if (!response.path("trasformContentJson").isMissingNode()) {
-                List<Object> contentJson = mapper.convertValue(response.get("trasformContentJson"), new TypeReference<List<Object>>() {});
+                List<Object> contentJson = mapper.convertValue(response.get("transformContentViaApi"), new TypeReference<List<Object>>() {});
                 Object transformData = dataTransformUtility.transformData(responseObject, contentJson);
                 if (transformData != null) {
                     return transformData;
@@ -62,10 +65,13 @@ public class IntegrationFrameworkUtil {
                     return responseObject;
                 }
             }
+            else {
+                return responseObject;
+            }
         } else {
             return responseObject;
         }
-        return responseObject;
+
     }
 
     private ObjectNode mergeHeaders(ObjectNode secureHeader, ObjectNode reqHeader) {
@@ -84,14 +90,12 @@ public class IntegrationFrameworkUtil {
         ObjectNode reqHeaderNode = mapper.createObjectNode();
         reqHeaderNode.put("content-type", "*/*");
         if (serviceLocator.isSecureHeader()) {
-            if (integrationModel.getPartnerCode() != null) {
+            if (serviceLocator.getPartnerCode() != null) {
                 String accessToken = "";
-                ContentSource contentSource = ContentSource.fromPartnerCode(integrationModel.getPartnerCode());
+                ContentSource contentSource = ContentSource.fromPartnerCode(serviceLocator.getPartnerCode());
                 if (contentSource != null) {
                     ContentPartnerPluginService service = contentPartnerServiceFactory.getContentPartnerPluginService(contentSource);
-                    JsonNode jsonNode=mapper.createObjectNode();
-                    ((ObjectNode)jsonNode).put("urlSegment",serviceLocator.getUrlSegment());
-                    accessToken=service.generateAuthHeader(jsonNode);
+                    accessToken=service.generateAuthHeader();
                     reqHeaderNode.put("Authorization", accessToken);
                 }
             }
@@ -130,12 +134,6 @@ public class IntegrationFrameworkUtil {
                 }
             }
             return reqHeaderNode;
-    }
-
-    private StringBuilder getIntegrationFrameWorkUrl() {
-        StringBuilder uriBuilder = new StringBuilder();
-        return (uriBuilder.append(config.getIntegrationFwHost())
-                .append(config.getIntegrationFwPath()));
     }
 
 }
