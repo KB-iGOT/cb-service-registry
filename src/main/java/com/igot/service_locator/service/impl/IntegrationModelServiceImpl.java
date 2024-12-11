@@ -71,6 +71,8 @@ public class IntegrationModelServiceImpl implements IntegrationModelService {
                 IntegrationModel model = replaceServiceRequestDtoPlaceholders(jsonNode, serviceRequestDto);
                 model.setServiceCode(serviceLocatorEntity.getServiceCode());
                 model.setPartnerCode(serviceLocatorEntity.getPartnerCode());
+                model.setStrictCache(serviceLocatorEntity.isStrictCache());
+                model.setStrictCacheTimeInMinutes(serviceLocatorEntity.getStrictCacheTimeInMinutes());
                 log.debug("model::{}", model);
                 return getDetailsFromExternalService(model);
             } else {
