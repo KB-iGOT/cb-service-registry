@@ -8,6 +8,7 @@ import com.igot.service_locator.dto.IntegrationFrameworkDto;
 import com.igot.service_locator.plugins.ContentPartnerPluginService;
 import com.igot.service_locator.repository.CallExternalService;
 import com.igot.service_locator.util.CbServerProperties;
+import com.igot.service_locator.util.Constants;
 import com.igot.service_locator.util.DataTransformUtility;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,17 +21,20 @@ import java.util.Map;
 @Slf4j
 public class CourseraPluginServiceImpl implements ContentPartnerPluginService {
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
+    private final CbServerProperties cbServerProperties;
+    private final CallExternalService callExternalService;
+    private final DataTransformUtility dataTransformUtility;
 
-    @Autowired
-    private CbServerProperties cbServerProperties;
-
-    @Autowired
-    private CallExternalService callExternalService;
-
-    @Autowired
-    private DataTransformUtility dataTransformUtility;
+    public CourseraPluginServiceImpl(ObjectMapper objectMapper,
+                     CbServerProperties cbServerProperties,
+                     CallExternalService callExternalService,
+                     DataTransformUtility dataTransformUtility) {
+        this.objectMapper = objectMapper;
+        this.cbServerProperties = cbServerProperties;
+        this.callExternalService = callExternalService;
+        this.dataTransformUtility = dataTransformUtility;
+    }
 
     @Override
     public String generateAuthHeader() {
@@ -46,11 +50,11 @@ public class CourseraPluginServiceImpl implements ContentPartnerPluginService {
         dto.setOperationType("PEER_TO_PEER");
         dto.setRequestHeader(requestHeader);
         dto.setRequestBody(requestBody);
-        dto.setServiceCode("coursera-auth-api");
-        dto.setServiceName("coursera-auth-api");
-        dto.setServiceDescription("coursera-auth-api");
+        dto.setServiceCode(Constants.COURSERA_AUTH_API);
+        dto.setServiceName(Constants.COURSERA_AUTH_API);
+        dto.setServiceDescription(Constants.COURSERA_AUTH_API);
         dto.setStrictCache(true);
-        dto.setStrictCacheTimeInMinutes(20);
+        dto.setStrictCacheTimeInMinutes(cbServerProperties.courseraAuthApiCacheTtl);
         Object response = callExternalService.fetchResult(dataTransformUtility.getIntegrationFrameWorkUrl(),dto);
         JsonNode jsonResponse=objectMapper.convertValue(response, new TypeReference<JsonNode>() {
         });

@@ -30,4 +30,7 @@ public class CbServerProperties {
 
     @Value("${coursera.auth.api.url}")
     public String courseraAuthApiUrl;
+
+    @Value("${coursera.auth.api.cache.ttl}")
+    public Long courseraAuthApiCacheTtl;
 }

@@ -24,4 +24,9 @@ public class IntegrationController {
     public Object callExternalApiServiceByConfigId(@RequestBody(required = false) ServiceRequestDto requestDto, @PathVariable String id) throws IOException {
         return service.getRequestPayloadByConfigId(requestDto,id);
     }
+
+    @PostMapping("/v1/callexternal/progressapibyid/{id}")
+    public Object callExternalProgressApiByConfigId(@RequestBody(required = false) ServiceRequestDto requestDto, @PathVariable String id){
+        return service.getProgressRequestPayloadByConfigId(requestDto,id);
+    }
 }

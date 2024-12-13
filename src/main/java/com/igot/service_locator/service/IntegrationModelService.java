@@ -12,4 +12,5 @@ import java.io.IOException;
 public interface IntegrationModelService {
      Object getDetailsFromExternalService(IntegrationModel integrationModel) throws IOException;
      Object getRequestPayloadByConfigId(ServiceRequestDto requestDto, String id) throws IOException;
+     Object getProgressRequestPayloadByConfigId(ServiceRequestDto requestDto, String id);
 }

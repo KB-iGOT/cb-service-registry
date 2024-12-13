@@ -26,25 +26,23 @@ import java.util.*;
 @Slf4j
 public class IntegrationFrameworkUtil {
 
-    @Autowired
-    private IntegrationConfig config;
+    private final IntegrationConfig config;
+    private final ObjectMapper mapper;
+    private final CallExternalService callExternalService;
+    private final DataTransformUtility dataTransformUtility;
+    private final ContentPartnerServiceFactory contentPartnerServiceFactory;
 
-    @Autowired
-    private ObjectMapper mapper;
-
-    @Autowired
-    private CallExternalService callExternalService;
-
-    @Autowired
-    private DataTransformUtility dataTransformUtility;
-
-    @Autowired
-    private ContentPartnerServiceFactory contentPartnerServiceFactory;
-
-    @Autowired
-    private CbServerProperties cbServerProperties;
-
-
+    public IntegrationFrameworkUtil(IntegrationConfig config,
+                     ObjectMapper mapper,
+                     CallExternalService callExternalService,
+                     DataTransformUtility dataTransformUtility,
+                     ContentPartnerServiceFactory contentPartnerServiceFactory) {
+        this.config = config;
+        this.mapper = mapper;
+        this.callExternalService = callExternalService;
+        this.dataTransformUtility = dataTransformUtility;
+        this.contentPartnerServiceFactory = contentPartnerServiceFactory;
+    }
     public Object callExternalServiceApi(
         IntegrationModel integrationModel, ServiceLocatorEntity serviceLocator) throws JsonProcessingException {
 
@@ -52,20 +50,37 @@ public class IntegrationFrameworkUtil {
         log.info("IntegrationFrameworkUtil::requestObject {} ", requestObject);
 
         Object responseObject = callExternalService.fetchResult(dataTransformUtility.getIntegrationFrameWorkUrl(), requestObject);
+        JsonNode responseJson = mapper.convertValue(responseObject, new TypeReference<JsonNode>() {});
+        JsonNode jsonNode = responseJson.get("responseData");
         log.info("Got successful response from external system service");
 
         if (integrationModel.getPartnerCode() != null) {
             JsonNode response = dataTransformUtility.callContentPartnerReadAPIByPartnerCode(integrationModel.getPartnerCode());
-            if (!response.path("trasformContentJson").isMissingNode()) {
-                List<Object> contentJson = mapper.convertValue(response.get("transformContentViaApi"), new TypeReference<List<Object>>() {});
-                Object transformData = dataTransformUtility.transformData(responseObject, contentJson);
+            if (!response.path("transformProgressViaApi").isMissingNode()) {
+                log.info("Inside transformProgressViaApi: {}", integrationModel.getPartnerCode());
+                List<Object> contentJson = mapper.convertValue(response.get("transformProgressViaApi"), new TypeReference<List<Object>>() {});
+                Object transformData = dataTransformUtility.transformData(jsonNode, contentJson);
                 if (transformData != null) {
                     return transformData;
                 } else {
                     return responseObject;
                 }
+            } else {
+                return responseObject;
             }
-            else {
+        } else if(serviceLocator.getPartnerCode() != null) {
+            log.info("serviceLocator.getPartnerCode(): {}", serviceLocator.getPartnerCode());
+            JsonNode response = dataTransformUtility.callContentPartnerReadAPIByPartnerCode(serviceLocator.getPartnerCode());
+            if (!response.path("transformContentViaApi").isMissingNode()) {
+                log.info("Inside transformContentViaApi: {}", serviceLocator.getPartnerCode());
+                List<Object> contentJson = mapper.convertValue(response.get("transformContentViaApi"), new TypeReference<List<Object>>() {});
+                Object transformData = dataTransformUtility.transformData(jsonNode, contentJson);
+                if (transformData != null) {
+                    return transformData;
+                } else {
+                    return responseObject;
+                }
+            } else {
                 return responseObject;
             }
         } else {
@@ -115,8 +130,8 @@ public class IntegrationFrameworkUtil {
         requestObject.put("serviceCode", serviceLocator.getServiceCode());
         requestObject.put("serviceName", serviceLocator.getServiceName());
         requestObject.put("serviceDescription", serviceLocator.getServiceDescription());
-        requestObject.put("strictCache", integrationModel.getStrictCache());
-        requestObject.put("strictCacheTimeInMinutes", integrationModel.getStrictCacheTimeInMinutes());
+        requestObject.put("strictCache", serviceLocator.isStrictCache());
+        requestObject.put("strictCacheTimeInMinutes", serviceLocator.getStrictCacheTimeInMinutes());
         requestObject.put("alwaysDataReadFromCache",integrationModel.isAlwaysDataReadFromCache());
         return requestObject;
     }
