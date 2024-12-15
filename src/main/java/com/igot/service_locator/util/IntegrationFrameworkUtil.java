@@ -56,35 +56,35 @@ public class IntegrationFrameworkUtil {
 
         if (integrationModel.getPartnerCode() != null) {
             JsonNode response = dataTransformUtility.callContentPartnerReadAPIByPartnerCode(integrationModel.getPartnerCode());
-            if (!response.path("transformProgressViaApi").isMissingNode()) {
-                log.info("Inside transformProgressViaApi: {}", integrationModel.getPartnerCode());
-                List<Object> contentJson = mapper.convertValue(response.get("transformProgressViaApi"), new TypeReference<List<Object>>() {});
-                Object transformData = dataTransformUtility.transformData(jsonNode, contentJson);
-                if (transformData != null) {
-                    return transformData;
-                } else {
-                    return responseObject;
-                }
-            } else {
-                return responseObject;
-            }
-        } else if(serviceLocator.getPartnerCode() != null) {
-            log.info("serviceLocator.getPartnerCode(): {}", serviceLocator.getPartnerCode());
-            JsonNode response = dataTransformUtility.callContentPartnerReadAPIByPartnerCode(serviceLocator.getPartnerCode());
             if (!response.path("transformContentViaApi").isMissingNode()) {
-                log.info("Inside transformContentViaApi: {}", serviceLocator.getPartnerCode());
+                log.info("Inside transformContentViaApi: {}", integrationModel.getPartnerCode());
                 List<Object> contentJson = mapper.convertValue(response.get("transformContentViaApi"), new TypeReference<List<Object>>() {});
                 Object transformData = dataTransformUtility.transformData(jsonNode, contentJson);
                 if (transformData != null) {
                     return transformData;
                 } else {
-                    return responseObject;
+                    return jsonNode;
                 }
             } else {
-                return responseObject;
+                return jsonNode;
+            }
+        } else if(serviceLocator.getPartnerCode() != null) {
+            log.info("serviceLocator.getPartnerCode(): {}", serviceLocator.getPartnerCode());
+            JsonNode response = dataTransformUtility.callContentPartnerReadAPIByPartnerCode(serviceLocator.getPartnerCode());
+            if (!response.path("transformProgressViaApi").isMissingNode()) {
+                log.info("Inside transformProgressViaApi: {}", serviceLocator.getPartnerCode());
+                List<Object> contentJson = mapper.convertValue(response.get("transformProgressViaApi"), new TypeReference<List<Object>>() {});
+                Object transformData = dataTransformUtility.transformData(jsonNode, contentJson);
+                if (transformData != null) {
+                    return transformData;
+                } else {
+                    return jsonNode;
+                }
+            } else {
+                return jsonNode;
             }
         } else {
-            return responseObject;
+            return jsonNode;
         }
 
     }

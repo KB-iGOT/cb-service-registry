@@ -70,6 +70,7 @@ public class IntegrationModelServiceImpl implements IntegrationModelService {
             if (!jsonNode.isMissingNode()) {
                 IntegrationModel model = replaceServiceRequestDtoPlaceholders(jsonNode, serviceRequestDto);
                 model.setServiceCode(serviceLocatorEntity.getServiceCode());
+                model.setPartnerCode(serviceLocatorEntity.getPartnerCode());
                 model.setStrictCache(serviceLocatorEntity.isStrictCache());
                 model.setStrictCacheTimeInMinutes(serviceLocatorEntity.getStrictCacheTimeInMinutes());
                 log.debug("model::{}", model);
@@ -90,7 +91,6 @@ public class IntegrationModelServiceImpl implements IntegrationModelService {
             JsonNode jsonNode = serviceLocatorEntity.getRequestPayload();
             if (!jsonNode.isMissingNode()) {
                 IntegrationModel model = replaceServiceRequestDtoPlaceholders(jsonNode, serviceRequestDto);
-                model.setPartnerCode(serviceLocatorEntity.getPartnerCode());
                 model.setServiceCode(serviceLocatorEntity.getServiceCode());
                 model.setStrictCache(serviceLocatorEntity.isStrictCache());
                 model.setStrictCacheTimeInMinutes(serviceLocatorEntity.getStrictCacheTimeInMinutes());
