@@ -77,6 +77,14 @@ public class ServiceLocatorEntity implements Serializable {
     @JsonProperty("partnerCode")
     private String partnerCode;
 
+    @Column(name = "strict_cache")
+    @JsonProperty("strictCache")
+    private boolean strictCache=false;
+
+    @Column(name = "strict_cache_time")
+    @JsonProperty("strictCacheTimeInMinutes")
+    private long strictCacheTimeInMinutes;
+
     public enum RequestMethod {
         GET("GET"),
         HEAD("HEAD"),
