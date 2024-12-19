@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "clientCode": {
+      "type": "string"
+    },
+    "clientSecret": {
+      "type": "string"
+    },
+    "clientSegment": {
+      "type": "string"
+    },
+    "clientCredentials": {
+      "type": "string"
+    },
+    "clientAuthUrl": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}

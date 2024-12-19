@@ -63,35 +63,39 @@ public class ServiceLocatorServiceImpl implements ServiceLocatorService {
 
     @Override
     public ServiceLocatorEntity createOrUpdateServiceConfig(ServiceLocatorEntity locatorEntity) {
-        locatorValidator.validate(locatorEntity);
-        if (locatorEntity.getId() == null) {
-            Optional<ServiceLocatorEntity> optSchemeDetails = serviceLocaterRepository.findByServiceCodeAndIsActiveTrue(locatorEntity.getServiceCode());
-            if (optSchemeDetails.isPresent()) {
-                throw new CustomException("SERVICE_CODE", "One service is already there in the system with service code : " + locatorEntity.getServiceCode() + " , " +
-                        "Please create a service config with unique service code", HttpStatus.BAD_REQUEST);
+        try {
+            locatorValidator.validate(locatorEntity);
+            if (locatorEntity.getId() == null) {
+                Optional<ServiceLocatorEntity> optSchemeDetails = serviceLocaterRepository.findByServiceCodeAndIsActiveTrue(locatorEntity.getServiceCode());
+                if (optSchemeDetails.isPresent()) {
+                    throw new CustomException("SERVICE_CODE", "One service is already there in the system with service code : " + locatorEntity.getServiceCode() + " , " +
+                            "Please create a service config with unique service code", HttpStatus.BAD_REQUEST);
+                }
+                UUID uuid = Generators.timeBasedGenerator().generate();
+                String id = uuid.toString();
+                locatorEntity.setId(id);
+                locatorEntity.setActive(Boolean.TRUE);
+                //save to the database
+                ServiceLocatorEntity serviceLocatorEntity = serviceLocaterRepository.save(locatorEntity);
+                // Save to Redis
+                redisTemplate.opsForValue().set(SERVICE_LOCATOR_KEY + serviceLocatorEntity.getServiceCode(), serviceLocatorEntity, Duration.ofMinutes(cacheDataTtl));
+                redisTemplate.opsForValue().set(SERVICE_LOCATOR_KEY + serviceLocatorEntity.getId(), serviceLocatorEntity, Duration.ofMinutes(cacheDataTtl));
+                return serviceLocatorEntity;
+            } else {
+                Optional<ServiceLocatorEntity> optSchemeDetails = serviceLocaterRepository.findById(locatorEntity.getId());
+                if (optSchemeDetails.isPresent()) {
+                    ServiceLocatorEntity batchService = optSchemeDetails.get();
+                    // Copy the property values from updatedSchemeDetails to schemeDetails, Exclude the "id" fields from being copied
+                    BeanUtils.copyProperties(locatorEntity, batchService, "id");
+                    redisTemplate.opsForValue().set(SERVICE_LOCATOR_KEY + batchService.getServiceCode(), batchService, Duration.ofMinutes(cacheDataTtl));
+                    redisTemplate.opsForValue().set(SERVICE_LOCATOR_KEY + batchService.getId(), batchService, Duration.ofMinutes(cacheDataTtl));
+                    return serviceLocaterRepository.save(batchService);
+                } else {
+                    throw new CustomException(ERROR_MESSAGE, "Data not present in Db with given Id", HttpStatus.BAD_REQUEST);
+                }
             }
-            UUID uuid = Generators.timeBasedGenerator().generate();
-            String id = uuid.toString();
-            locatorEntity.setId(id);
-            locatorEntity.setActive(Boolean.TRUE);
-            //save to the database
-            ServiceLocatorEntity serviceLocatorEntity = serviceLocaterRepository.save(locatorEntity);
-            // Save to Redis
-            redisTemplate.opsForValue().set(SERVICE_LOCATOR_KEY + serviceLocatorEntity.getServiceCode(), serviceLocatorEntity, Duration.ofMinutes(cacheDataTtl));
-            redisTemplate.opsForValue().set(SERVICE_LOCATOR_KEY + serviceLocatorEntity.getId(), serviceLocatorEntity, Duration.ofMinutes(cacheDataTtl));
-            return serviceLocatorEntity;
-        }else{
-            Optional<ServiceLocatorEntity> optSchemeDetails = serviceLocaterRepository.findById(locatorEntity.getId());
-            if (optSchemeDetails.isPresent()) {
-                ServiceLocatorEntity batchService = optSchemeDetails.get();
-                // Copy the property values from updatedSchemeDetails to schemeDetails, Exclude the "id" fields from being copied
-                BeanUtils.copyProperties(locatorEntity, batchService, "id");
-                redisTemplate.opsForValue().set(SERVICE_LOCATOR_KEY + batchService.getServiceCode(), batchService, Duration.ofMinutes(cacheDataTtl));
-                redisTemplate.opsForValue().set(SERVICE_LOCATOR_KEY + batchService.getId(), batchService, Duration.ofMinutes(cacheDataTtl));
-                return serviceLocaterRepository.save(batchService);
-            }else{
-                throw new CustomException(ERROR_MESSAGE, "Data not present in Db with given Id", HttpStatus.BAD_REQUEST);
-            }
+        }catch (Exception e){
+            throw new CustomException(ERROR_MESSAGE, e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 

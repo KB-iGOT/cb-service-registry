@@ -21,11 +21,13 @@ public class CornellPluginServiceImpl  implements ContentPartnerPluginService {
     private CbServerProperties cbServerProperties;
 
     @Override
-    public String generateAuthHeader() {
+    public String generateAuthHeader(JsonNode jsonNode) {
         log.info("CornellPluginServiceImpl::generateAuthHeader");
-        String urlSegment = cbServerProperties.getCornellUrlSegment();
+        String urlSegment = jsonNode.get("clientSegment").asText();
+        String clientCode=jsonNode.get("clientSecret").asText();
+        String clientSecret=jsonNode.get("clientCode").asText();
         String timestamp = String.valueOf(System.currentTimeMillis());
-        String toHash = urlSegment + cbServerProperties.getCornellClientCode() + timestamp + cbServerProperties.getCornellClientSecret();
+        String toHash = urlSegment + clientCode + timestamp + clientSecret;
         MessageDigest md = null;
         try {
             md = MessageDigest.getInstance("MD5");
@@ -43,6 +45,6 @@ public class CornellPluginServiceImpl  implements ContentPartnerPluginService {
             hashString.append(String.format("%02x", b));
         }
         String authHash = hashString.toString();
-        return cbServerProperties.getCornellClientCode() + "." + timestamp + "." + authHash;
+        return clientCode + "." + timestamp + "." + authHash;
     }
 }

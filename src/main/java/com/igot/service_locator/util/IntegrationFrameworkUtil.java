@@ -11,6 +11,7 @@ import com.igot.service_locator.entity.IntegrationModel;
 import com.igot.service_locator.entity.ServiceLocatorEntity;
 import com.igot.service_locator.plugins.ContentPartnerPluginService;
 import com.igot.service_locator.plugins.config.ContentPartnerServiceFactory;
+import com.igot.service_locator.plugins.coursera.CourseraPluginServiceImpl;
 import com.igot.service_locator.repository.CallExternalService;
 import com.igot.service_locator.config.IntegrationConfig;
 import com.igot.service_locator.plugins.ContentSource;
@@ -31,17 +32,20 @@ public class IntegrationFrameworkUtil {
     private final CallExternalService callExternalService;
     private final DataTransformUtility dataTransformUtility;
     private final ContentPartnerServiceFactory contentPartnerServiceFactory;
+    private final CourseraPluginServiceImpl courseraPluginService;
 
     public IntegrationFrameworkUtil(IntegrationConfig config,
-                     ObjectMapper mapper,
-                     CallExternalService callExternalService,
-                     DataTransformUtility dataTransformUtility,
-                     ContentPartnerServiceFactory contentPartnerServiceFactory) {
+                                    ObjectMapper mapper,
+                                    CallExternalService callExternalService,
+                                    DataTransformUtility dataTransformUtility,
+                                    ContentPartnerServiceFactory contentPartnerServiceFactory,
+                                    CourseraPluginServiceImpl courseraPluginService) {
         this.config = config;
         this.mapper = mapper;
         this.callExternalService = callExternalService;
         this.dataTransformUtility = dataTransformUtility;
         this.contentPartnerServiceFactory = contentPartnerServiceFactory;
+        this.courseraPluginService = courseraPluginService;
     }
     public Object callExternalServiceApi(
         IntegrationModel integrationModel, ServiceLocatorEntity serviceLocator) throws JsonProcessingException {
@@ -107,11 +111,9 @@ public class IntegrationFrameworkUtil {
         if (serviceLocator.isSecureHeader()) {
             if (serviceLocator.getPartnerCode() != null) {
                 String accessToken = "";
-                ContentSource contentSource = ContentSource.fromPartnerCode(serviceLocator.getPartnerCode());
-                if (contentSource != null) {
-                    ContentPartnerPluginService service = contentPartnerServiceFactory.getContentPartnerPluginService(contentSource);
-                    accessToken=service.generateAuthHeader();
-                    reqHeaderNode.put("Authorization", accessToken);
+                if(!serviceLocator.getAuthPayload().isMissingNode()){
+                    accessToken=courseraPluginService.generateAuthHeader(serviceLocator.getAuthPayload());
+                reqHeaderNode.put("Authorization", accessToken);
                 }
             }
             ObjectNode secureHeader = reqHeaderNode;

@@ -85,6 +85,11 @@ public class ServiceLocatorEntity implements Serializable {
     @JsonProperty("strictCacheTimeInMinutes")
     private long strictCacheTimeInMinutes;
 
+    @Column(columnDefinition = "auth_payload")
+    @JsonProperty("authPayload")
+    @Type(type = "jsonb")
+    private JsonNode authPayload;
+
     public enum RequestMethod {
         GET("GET"),
         HEAD("HEAD"),

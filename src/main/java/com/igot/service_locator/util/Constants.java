@@ -5,4 +5,5 @@ public class Constants {
     public static final String ERROR = "ERROR";
     public static final String COURSERA_AUTH_API = "coursera-auth-api";
 
+    public static final String PAYLOAD_VALIDATION_FILE_AUTH_PAYLOAD = "/jsonpayloadvalidation/authpayloadvalidation.json";
 }
