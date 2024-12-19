@@ -100,7 +100,7 @@ public class IntegrationModelServiceImpl implements IntegrationModelService {
                 throw new CustomException(Constants.ERROR, "requestDto not present in Db with given Id ", HttpStatus.BAD_REQUEST);
             }
         } catch (Exception e) {
-            throw new CustomException(Constants.ERROR, e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new CustomException(Constants.ERROR, e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 

@@ -1,17 +1,16 @@
-package com.igot.service_locator.plugins.coursera;
+package com.igot.service_locator.plugins;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.igot.service_locator.dto.IntegrationFrameworkDto;
-import com.igot.service_locator.plugins.ContentPartnerPluginService;
 import com.igot.service_locator.repository.CallExternalService;
 import com.igot.service_locator.util.CbServerProperties;
 import com.igot.service_locator.util.Constants;
 import com.igot.service_locator.util.DataTransformUtility;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
@@ -20,26 +19,25 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 
-@Service
+@Component
 @Slf4j
-public class CourseraPluginServiceImpl implements ContentPartnerPluginService {
+public class AuthPluginService{
 
     private final ObjectMapper objectMapper;
     private final CbServerProperties cbServerProperties;
     private final CallExternalService callExternalService;
     private final DataTransformUtility dataTransformUtility;
 
-    public CourseraPluginServiceImpl(ObjectMapper objectMapper,
-                     CbServerProperties cbServerProperties,
-                     CallExternalService callExternalService,
-                     DataTransformUtility dataTransformUtility) {
+    public AuthPluginService(ObjectMapper objectMapper,
+                             CbServerProperties cbServerProperties,
+                             CallExternalService callExternalService,
+                             DataTransformUtility dataTransformUtility) {
         this.objectMapper = objectMapper;
         this.cbServerProperties = cbServerProperties;
         this.callExternalService = callExternalService;
         this.dataTransformUtility = dataTransformUtility;
     }
 
-    @Override
     public String generateAuthHeader(JsonNode jsonNode) {
         if(jsonNode.has("clientAuthUrl")&&jsonNode.has("clientCredentials")) {
             log.info("CourseraPluginServiceImpl::generateAuthHeader");

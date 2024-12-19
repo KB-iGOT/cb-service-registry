@@ -1,7 +1,5 @@
 package com.igot.service_locator.util;
 
-import com.bazaarvoice.jolt.Chainr;
-import com.bazaarvoice.jolt.JsonUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -9,16 +7,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.igot.service_locator.entity.IntegrationModel;
 import com.igot.service_locator.entity.ServiceLocatorEntity;
-import com.igot.service_locator.plugins.ContentPartnerPluginService;
-import com.igot.service_locator.plugins.config.ContentPartnerServiceFactory;
-import com.igot.service_locator.plugins.coursera.CourseraPluginServiceImpl;
+import com.igot.service_locator.plugins.AuthPluginService;
 import com.igot.service_locator.repository.CallExternalService;
 import com.igot.service_locator.config.IntegrationConfig;
-import com.igot.service_locator.plugins.ContentSource;
-import com.igot.service_locator.plugins.cornell.CornellPluginServiceImpl;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import java.util.*;
 
@@ -31,21 +23,18 @@ public class IntegrationFrameworkUtil {
     private final ObjectMapper mapper;
     private final CallExternalService callExternalService;
     private final DataTransformUtility dataTransformUtility;
-    private final ContentPartnerServiceFactory contentPartnerServiceFactory;
-    private final CourseraPluginServiceImpl courseraPluginService;
+    private final AuthPluginService authPluginService;
 
     public IntegrationFrameworkUtil(IntegrationConfig config,
                                     ObjectMapper mapper,
                                     CallExternalService callExternalService,
                                     DataTransformUtility dataTransformUtility,
-                                    ContentPartnerServiceFactory contentPartnerServiceFactory,
-                                    CourseraPluginServiceImpl courseraPluginService) {
+                                    AuthPluginService authPluginService) {
         this.config = config;
         this.mapper = mapper;
         this.callExternalService = callExternalService;
         this.dataTransformUtility = dataTransformUtility;
-        this.contentPartnerServiceFactory = contentPartnerServiceFactory;
-        this.courseraPluginService = courseraPluginService;
+        this.authPluginService = authPluginService;
     }
     public Object callExternalServiceApi(
         IntegrationModel integrationModel, ServiceLocatorEntity serviceLocator) throws JsonProcessingException {
@@ -109,12 +98,10 @@ public class IntegrationFrameworkUtil {
         ObjectNode reqHeaderNode = mapper.createObjectNode();
         reqHeaderNode.put("content-type", "*/*");
         if (serviceLocator.isSecureHeader()) {
-            if (serviceLocator.getPartnerCode() != null) {
-                String accessToken = "";
-                if(!serviceLocator.getAuthPayload().isMissingNode()){
-                    accessToken=courseraPluginService.generateAuthHeader(serviceLocator.getAuthPayload());
+            String accessToken = "";
+            if (!serviceLocator.getAuthPayload().isMissingNode()) {
+                accessToken = authPluginService.generateAuthHeader(serviceLocator.getAuthPayload());
                 reqHeaderNode.put("Authorization", accessToken);
-                }
             }
             ObjectNode secureHeader = reqHeaderNode;
             if (integrationModel.getHeaderMap() != null && !integrationModel.getHeaderMap().isEmpty()) {
