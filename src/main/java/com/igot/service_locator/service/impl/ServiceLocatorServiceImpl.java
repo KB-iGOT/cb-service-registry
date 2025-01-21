@@ -29,7 +29,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import javax.persistence.EntityManager;
+
 import java.time.Duration;
 import java.util.*;
 
@@ -43,8 +43,7 @@ public class ServiceLocatorServiceImpl implements ServiceLocatorService {
     private RedisTemplate redisTemplate;
     @Autowired
     private ServiceLocatorRepository serviceLocaterRepository;
-    @Autowired
-    private EntityManager entityManager;
+
     @Autowired
     private ServiceLocatorValidator locatorValidator;
     @Autowired

@@ -3,8 +3,6 @@ package com.igot.service_locator.service;
 import com.igot.service_locator.dto.ServiceRequestDto;
 import com.igot.service_locator.entity.IntegrationModel;
 import org.springframework.stereotype.Service;
-
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
 
