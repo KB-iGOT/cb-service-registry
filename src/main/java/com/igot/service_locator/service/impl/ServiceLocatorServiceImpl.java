@@ -14,6 +14,9 @@ import com.igot.service_locator.service.ServiceLocatorService;
 import com.igot.service_locator.util.Constants;
 import com.igot.service_locator.validator.ServiceLocatorValidator;
 import com.fasterxml.uuid.Generators;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -29,7 +32,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import javax.persistence.EntityManager;
+
 import java.time.Duration;
 import java.util.*;
 
@@ -43,8 +46,7 @@ public class ServiceLocatorServiceImpl implements ServiceLocatorService {
     private RedisTemplate redisTemplate;
     @Autowired
     private ServiceLocatorRepository serviceLocaterRepository;
-    @Autowired
-    private EntityManager entityManager;
+
     @Autowired
     private ServiceLocatorValidator locatorValidator;
     @Autowired
