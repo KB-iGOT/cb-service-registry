@@ -40,7 +40,7 @@ public class ServiceLocatorServiceImpl implements ServiceLocatorService {
     @Value("${cache.data.ttl.in.minutes}")
     public Long cacheDataTtl;
     @Autowired
-    private RedisTemplate redisTemplate;
+    private RedisTemplate<String, Object> redisTemplate;
     @Autowired
     private ServiceLocatorRepository serviceLocaterRepository;
 
