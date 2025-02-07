@@ -7,4 +7,5 @@ public class Constants {
 
     public static final String PAYLOAD_VALIDATION_FILE_AUTH_PAYLOAD = "/jsonpayloadvalidation/authpayloadvalidation.json";
     public static final String SERVICE_LOCATOR_KEY = "servicelocator_";
+    public static final String SUCCESS = "Success";
 }
