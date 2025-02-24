@@ -6,6 +6,7 @@ import com.igot.service_locator.entity.ServiceLocatorEntity;
 import com.igot.service_locator.service.ServiceLocatorService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.igot.service_locator.util.Constants;
@@ -15,6 +16,9 @@ import java.util.List;
 @RequestMapping("serviceregistry")
 @Slf4j
 public class ServiceLocatorController {
+
+    @Autowired
+    private RedisConnectionFactory redisConnectionFactory;
 
     @Autowired
     private ServiceLocatorService serviceLocatorService;
@@ -52,8 +56,13 @@ public class ServiceLocatorController {
         return ResponseEntity.ok(serviceLocatorService.readServiceConfig(id, isActive));
     }
 
-    @GetMapping("/health")
-    public String healthCheck() {
-        return Constants.SUCCESS;
+    @GetMapping("/redis-health")
+    public String checkRedisHealth() {
+        try {
+            redisConnectionFactory.getConnection().ping();
+            return "Redis is up and running";
+        } catch (Exception e) {
+            return "Unable to connect to Redis: " + e.getMessage();
+        }
     }
 }
