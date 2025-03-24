@@ -97,18 +97,21 @@ public class IntegrationFrameworkUtil {
         requestObject.put("operationType", serviceLocator.getOperationType());
         ObjectNode reqHeaderNode = mapper.createObjectNode();
         reqHeaderNode.put("content-type", "*/*");
+        ObjectNode secureHeader = reqHeaderNode;
         if (serviceLocator.isSecureHeader()) {
             String accessToken = "";
             if (!serviceLocator.getAuthPayload().isMissingNode()) {
                 accessToken = authPluginService.generateAuthHeader(serviceLocator.getAuthPayload());
                 reqHeaderNode.put("Authorization", accessToken);
             }
-            ObjectNode secureHeader = reqHeaderNode;
             if (integrationModel.getHeaderMap() != null && !integrationModel.getHeaderMap().isEmpty()) {
                 ObjectNode requestHeader = getRequestHeader(integrationModel);
                 reqHeaderNode = mergeHeaders(secureHeader, requestHeader);
-            } else {
-                reqHeaderNode = secureHeader;
+            }
+        } else {
+            if (integrationModel.getHeaderMap() != null && !integrationModel.getHeaderMap().isEmpty()) {
+                ObjectNode requestHeader = getRequestHeader(integrationModel);
+                reqHeaderNode = mergeHeaders(secureHeader, requestHeader);
             }
         }
         requestObject.putPOJO("requestHeader", reqHeaderNode);
