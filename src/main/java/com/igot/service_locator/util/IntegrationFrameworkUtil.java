@@ -99,8 +99,9 @@ public class IntegrationFrameworkUtil {
         reqHeaderNode.put("content-type", "*/*");
         ObjectNode secureHeader = reqHeaderNode;
         if (serviceLocator.isSecureHeader()) {
+            JsonNode authPayload = serviceLocator.getAuthPayload();
             String accessToken = "";
-            if (!serviceLocator.getAuthPayload().isMissingNode()) {
+            if (authPayload != null&&!authPayload.isMissingNode() && !authPayload.isEmpty()) {
                 accessToken = authPluginService.generateAuthHeader(serviceLocator.getAuthPayload());
                 reqHeaderNode.put("Authorization", accessToken);
             }
