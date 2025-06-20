@@ -101,7 +101,7 @@ public class IntegrationFrameworkUtil {
         if (serviceLocator.isSecureHeader()) {
             JsonNode authPayload = serviceLocator.getAuthPayload();
             String accessToken = "";
-            if (authPayload != null&&!authPayload.isMissingNode() && !authPayload.isEmpty()) {
+            if (authPayload != null&&!authPayload.isEmpty()&&!authPayload.isMissingNode()) {
                 accessToken = authPluginService.generateAuthHeader(serviceLocator.getAuthPayload());
                 reqHeaderNode.put("Authorization", accessToken);
             }
