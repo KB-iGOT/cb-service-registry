@@ -88,6 +88,7 @@ public class IntegrationFrameworkUtil {
         mergedHeader.setAll(reqHeader);
         return mergedHeader;
     }
+
     private ObjectNode createRequestObject(ServiceLocatorEntity serviceLocator, IntegrationModel integrationModel) {
         ObjectNode requestObject = mapper.createObjectNode();
         requestObject.put("url", serviceLocator.getUrl());
@@ -101,7 +102,7 @@ public class IntegrationFrameworkUtil {
         if (serviceLocator.isSecureHeader()) {
             JsonNode authPayload = serviceLocator.getAuthPayload();
             String accessToken = "";
-            if (authPayload != null&&!authPayload.isEmpty()&&!authPayload.isMissingNode()) {
+            if (authPayload != null && !authPayload.isEmpty() && !authPayload.isMissingNode()) {
                 accessToken = authPluginService.generateAuthHeader(serviceLocator.getAuthPayload());
                 reqHeaderNode.put("Authorization", accessToken);
             }
