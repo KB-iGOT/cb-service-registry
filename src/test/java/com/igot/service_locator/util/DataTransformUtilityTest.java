@@ -172,5 +172,68 @@ class DataTransformUtilityTest {
         verify(mapper).valueToTree(source);
         verify(errorNode).put(eq("message"), anyString());
     }
+
+    @Test
+    void testCallContentPartnerReadAPIByPartnerCode_responseBodyIsNullReference() {
+        // Arrange
+        String partnerCode = "partner123";
+        String baseUrl = "http://baseurl/";
+        String readApiUrl = "read/";
+
+        when(cbServerProperties.getContentPartnerBaseUrl()).thenReturn(baseUrl);
+        when(cbServerProperties.getContentPartnerReadApiUrl()).thenReturn(readApiUrl);
+
+        String expectedUrl = baseUrl + readApiUrl + partnerCode;
+
+        ResponseEntity<JsonNode> responseEntity = mock(ResponseEntity.class);
+        when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
+        when(responseEntity.getBody()).thenReturn(null);
+
+        when(restTemplate.exchange(
+                eq(expectedUrl),
+                eq(HttpMethod.GET),
+                any(HttpEntity.class),
+                eq(JsonNode.class)
+        )).thenReturn(responseEntity);
+
+        // Act & Assert
+        CustomException ex = assertThrows(CustomException.class,
+                () -> utility.callContentPartnerReadAPIByPartnerCode(partnerCode));
+
+        assertEquals(Constants.ERROR, ex.getCode());
+    }
+    @Test
+    void testCallContentPartnerReadAPIByPartnerCode_responseBodyIsJsonNull() {
+        // Arrange
+        String partnerCode = "partner123";
+        String baseUrl = "http://baseurl/";
+        String readApiUrl = "read/";
+
+        when(cbServerProperties.getContentPartnerBaseUrl()).thenReturn(baseUrl);
+        when(cbServerProperties.getContentPartnerReadApiUrl()).thenReturn(readApiUrl);
+
+        String expectedUrl = baseUrl + readApiUrl + partnerCode;
+
+        JsonNode jsonNode = mock(JsonNode.class);
+        when(jsonNode.isNull()).thenReturn(true);
+
+        ResponseEntity<JsonNode> responseEntity = mock(ResponseEntity.class);
+        when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
+        when(responseEntity.getBody()).thenReturn(jsonNode);
+
+        when(restTemplate.exchange(
+                eq(expectedUrl),
+                eq(HttpMethod.GET),
+                any(HttpEntity.class),
+                eq(JsonNode.class)
+        )).thenReturn(responseEntity);
+
+        // Act & Assert
+        CustomException ex = assertThrows(CustomException.class,
+                () -> utility.callContentPartnerReadAPIByPartnerCode(partnerCode));
+
+        assertEquals(Constants.ERROR, ex.getCode());
+    }
+
 }
 

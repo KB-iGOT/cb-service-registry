@@ -25,7 +25,7 @@ class PaginatedResponseTest {
         assertThat(response.getTotalPages()).isEqualTo(5);
         assertThat(response.getTotalElements()).isEqualTo(100L);
         assertThat(response.getNumberOfElements()).isEqualTo(20);
-        assertThat(response.getOffset()).isEqualTo(0);
+        assertThat(response.getOffset()).isZero();
         assertThat(response.getLimit()).isEqualTo(10);
     }
 
@@ -55,7 +55,7 @@ class PaginatedResponseTest {
         PaginatedResponse<String> r2 = new PaginatedResponse<>(data, 2, 20L, 5, 0, 10);
 
         assertThat(r1).isEqualTo(r2);
-        assertThat(r1.hashCode()).isEqualTo(r2.hashCode());
+        assertThat(r1.hashCode()).hasSameHashCodeAs(r2.hashCode());
         assertThat(r1.toString()).contains("result", "totalPages", "totalElements");
     }
 }

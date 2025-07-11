@@ -119,23 +119,22 @@ class AuthPluginServiceTest {
 
     @Test
     void testGenerateAuthHeader_MD5AlgorithmException() {
+        // Arrange
+        AuthPluginService faultyAuthPluginService = new AuthPluginService(objectMapper, cbServerProperties, callExternalService, dataTransformUtility) {
+            @Override
+            public String generateAuthHeader(JsonNode node) {
+                try {
+                    // Simulate failure on MD5
+                    MessageDigest.getInstance("InvalidAlgo");
+                    return super.generateAuthHeader(node);
+                } catch (NoSuchAlgorithmException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        };
 
         // Act & Assert
-        assertThrows(RuntimeException.class, () -> {
-            authPluginService = new AuthPluginService(objectMapper, cbServerProperties, callExternalService, dataTransformUtility) {
-                @Override
-                public String generateAuthHeader(JsonNode node) {
-                    try {
-                        // This is just to simulate failure on MD5
-                        MessageDigest.getInstance("InvalidAlgo");
-                        return super.generateAuthHeader(node);
-                    } catch (NoSuchAlgorithmException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            };
-            authPluginService.generateAuthHeader(jsonNode);
-        });
+        assertThrows(RuntimeException.class, () -> faultyAuthPluginService.generateAuthHeader(jsonNode));
     }
 
 }
