@@ -34,7 +34,7 @@ class PaginatedRequestDtoTest {
         PaginatedRequestDto dto2 = new PaginatedRequestDto(1, 2, true);
 
         assertThat(dto1).isEqualTo(dto2);
-        assertThat(dto1.hashCode()).isEqualTo(dto2.hashCode());
+        assertThat(dto1.hashCode()).hasSameHashCodeAs(dto2.hashCode());
         assertThat(dto1.toString()).contains("offset=1", "limit=2", "isActive=true");
     }
 }

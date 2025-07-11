@@ -69,7 +69,7 @@ class IntegrationModelValidatorTest {
     }
 
     @Test
-    void testValidateModel_withBlankServiceCode() throws Exception {
+    void testValidateModel_withBlankServiceCode() {
         integrationModel.setServiceCode("");
         integrationModel.setRequestBody(null);
 

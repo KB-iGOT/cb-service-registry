@@ -40,13 +40,13 @@ class CallExternalServiceTest {
         Object requestData = Map.of("key", "value");
         Map<String, Object> expectedResponse = Map.of("result", "ok");
 
-        when(restTemplate.postForObject(eq(uri.toString()), eq(requestData), eq(Map.class)))
+        when(restTemplate.postForObject(uri.toString(), requestData, Map.class))
                 .thenReturn(expectedResponse);
 
         Object result = callExternalService.fetchResult(uri, requestData);
 
         assertEquals(expectedResponse, result);
-        verify(restTemplate).postForObject(eq(uri.toString()), eq(requestData), eq(Map.class));
+        verify(restTemplate).postForObject(uri.toString(), requestData, Map.class);
     }
 
     @Test
@@ -56,7 +56,7 @@ class CallExternalServiceTest {
 
         HttpClientErrorException ex = new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Bad Request", "error body".getBytes(), null);
 
-        when(restTemplate.postForObject(eq(uri.toString()), eq(requestData), eq(Map.class)))
+        when(restTemplate.postForObject(uri.toString(), requestData, Map.class))
                 .thenThrow(ex);
 
         CustomException thrown = assertThrows(CustomException.class, () ->
@@ -71,7 +71,7 @@ class CallExternalServiceTest {
         StringBuilder uri = new StringBuilder("http://test");
         Object requestData = Map.of("key", "value");
 
-        when(restTemplate.postForObject(eq(uri.toString()), eq(requestData), eq(Map.class)))
+        when(restTemplate.postForObject(uri.toString(), requestData, Map.class))
                 .thenThrow(new RuntimeException("Something went wrong"));
 
         CustomException thrown = assertThrows(CustomException.class, () ->
