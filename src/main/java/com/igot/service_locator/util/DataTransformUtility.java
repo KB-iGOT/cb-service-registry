@@ -42,6 +42,9 @@ public class DataTransformUtility {
         );
         if (response.getStatusCode().is2xxSuccessful()) {
             JsonNode jsonNode = response.getBody();
+            if (jsonNode == null || jsonNode.isNull()) {
+                throw new CustomException(Constants.ERROR, "Response body is null.", HttpStatus.INTERNAL_SERVER_ERROR);
+            }
             return jsonNode.path("result");
         } else {
             throw new CustomException(Constants.ERROR,"Failed to retrieve data. Status code: " + response.getStatusCodeValue(), HttpStatus.BAD_REQUEST);
