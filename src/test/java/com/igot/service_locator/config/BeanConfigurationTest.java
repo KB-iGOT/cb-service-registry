@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
 import java.lang.reflect.Field;
@@ -24,9 +26,14 @@ class BeanConfigurationTest {
     }
 
     @Test
-    void testGetRestTemplate() {
-        RestTemplate restTemplate = config.getRestTemplate();
-        assertNotNull(restTemplate);
+    void testRestTemplate() {
+        RestTemplate restTemplate = config.restTemplate();
+        assertNotNull(restTemplate, "RestTemplate should not be null");
+
+        ClientHttpRequestFactory factory = restTemplate.getRequestFactory();
+        assertNotNull(factory, "RequestFactory should not be null");
+        assertTrue(factory instanceof HttpComponentsClientHttpRequestFactory,
+                "RestTemplate should use HttpComponentsClientHttpRequestFactory");
     }
 
     @Test
