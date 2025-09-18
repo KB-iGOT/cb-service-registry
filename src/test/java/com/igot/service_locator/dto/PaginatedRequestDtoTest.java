@@ -37,4 +37,55 @@ class PaginatedRequestDtoTest {
         assertThat(dto1.hashCode()).hasSameHashCodeAs(dto2.hashCode());
         assertThat(dto1.toString()).contains("offset=1", "limit=2", "isActive=true");
     }
+
+
+    @Test
+    void testEqualsHashCodeAndToStringForEqualObjects() {
+        PaginatedRequestDto dto1 = new PaginatedRequestDto(1, 2, true);
+        PaginatedRequestDto dto2 = new PaginatedRequestDto(1, 2, true);
+        assertThat(dto1)
+                .isEqualTo(dto2)
+                .hasSameHashCodeAs(dto2)
+                .hasToString(dto2.toString())
+                .extracting(PaginatedRequestDto::toString)
+                .asString()
+                .contains("offset=1", "limit=2", "isActive=true");
+    }
+
+    @Test
+    void testEqualsSameReferenceAndNullAndDifferentClass() {
+        PaginatedRequestDto dto = new PaginatedRequestDto(1, 2, true);
+        assertThat(dto)
+                .isEqualTo(dto)
+                .isNotEqualTo(null)
+                .isNotEqualTo("string");
+    }
+
+
+    @Test
+    void testEqualsDifferentFieldValues() {
+        PaginatedRequestDto dto1 = new PaginatedRequestDto(1, 2, true);
+        PaginatedRequestDto dto2 = new PaginatedRequestDto(99, 2, true);
+        assertThat(dto1).isNotEqualTo(dto2);
+        dto2 = new PaginatedRequestDto(1, 99, true);
+        assertThat(dto1).isNotEqualTo(dto2);
+        dto2 = new PaginatedRequestDto(1, 2, false);
+        assertThat(dto1).isNotEqualTo(dto2);
+    }
+
+    @Test
+    void testEqualsWithNullBooleanField() {
+        PaginatedRequestDto dto1 = new PaginatedRequestDto(1, 2, null);
+        PaginatedRequestDto dto2 = new PaginatedRequestDto(1, 2, null);
+        assertThat(dto1).isEqualTo(dto2);
+        dto2 = new PaginatedRequestDto(1, 2, true);
+        assertThat(dto1).isNotEqualTo(dto2);
+    }
+
+    @Test
+    void testHashCodeWithDifferentValues() {
+        PaginatedRequestDto dto1 = new PaginatedRequestDto(1, 2, true);
+        PaginatedRequestDto dto2 = new PaginatedRequestDto(2, 3, false);
+        assertThat(dto1.hashCode()).isNotEqualTo(dto2.hashCode());
+    }
 }

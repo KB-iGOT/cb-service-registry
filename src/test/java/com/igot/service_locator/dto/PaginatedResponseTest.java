@@ -32,7 +32,6 @@ class PaginatedResponseTest {
     @Test
     void testNoArgsConstructorAndSetters() {
         PaginatedResponse<String> response = new PaginatedResponse<>();
-
         response.setResult(List.of("a", "b"));
         response.setTotalPages(3);
         response.setTotalElements(50L);
@@ -57,5 +56,56 @@ class PaginatedResponseTest {
         assertThat(r1).isEqualTo(r2);
         assertThat(r1.hashCode()).hasSameHashCodeAs(r2.hashCode());
         assertThat(r1.toString()).contains("result", "totalPages", "totalElements");
+    }
+
+
+    @Test
+    void testEqualsHashCodeAndToStringForEqualObjects() {
+        List<String> data = List.of("x", "y");
+        PaginatedResponse<String> r1 = new PaginatedResponse<>(data, 2, 20L, 5, 0, 10);
+        PaginatedResponse<String> r2 = new PaginatedResponse<>(data, 2, 20L, 5, 0, 10);
+        assertThat(r1)
+                .isEqualTo(r2)
+                .hasSameHashCodeAs(r2)
+                .hasToString(r2.toString());
+    }
+
+    @Test
+    void testEqualsSameReferenceNullAndDifferentClass() {
+        PaginatedResponse<String> r1 = new PaginatedResponse<>(List.of("a"), 1, 1L, 1, 0, 1);
+        assertThat(r1)
+                .isEqualTo(r1)
+                .isNotEqualTo(null)
+                .isNotEqualTo("string");
+    }
+
+    @Test
+    void testEqualsDifferentFieldValues() {
+        List<String> data = List.of("a", "b");
+        PaginatedResponse<String> base = new PaginatedResponse<>(data, 1, 2L, 3, 4, 5);
+        assertThat(base)
+                .isNotEqualTo(new PaginatedResponse<>(List.of("z"), 1, 2L, 3, 4, 5))
+                .isNotEqualTo(new PaginatedResponse<>(data, 9, 2L, 3, 4, 5))
+                .isNotEqualTo(new PaginatedResponse<>(data, 1, 99L, 3, 4, 5))
+                .isNotEqualTo(new PaginatedResponse<>(data, 1, 2L, 42, 4, 5))
+                .isNotEqualTo(new PaginatedResponse<>(data, 1, 2L, 3, 7, 5))
+                .isNotEqualTo(new PaginatedResponse<>(data, 1, 2L, 3, 4, 99));
+    }
+
+
+    @Test
+    void testEqualsWithNullListField() {
+        PaginatedResponse<String> r1 = new PaginatedResponse<>(null, 1, 1L, 1, 0, 1);
+        PaginatedResponse<String> r2 = new PaginatedResponse<>(null, 1, 1L, 1, 0, 1);
+        assertThat(r1).isEqualTo(r2);
+        r2 = new PaginatedResponse<>(List.of("x"), 1, 1L, 1, 0, 1);
+        assertThat(r1).isNotEqualTo(r2);
+    }
+
+    @Test
+    void testHashCodeWithDifferentValues() {
+        PaginatedResponse<String> r1 = new PaginatedResponse<>(List.of("a"), 1, 1L, 1, 0, 1);
+        PaginatedResponse<String> r2 = new PaginatedResponse<>(List.of("b"), 2, 2L, 2, 1, 2);
+        assertThat(r1.hashCode()).isNotEqualTo(r2.hashCode());
     }
 }
