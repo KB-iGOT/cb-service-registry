@@ -32,13 +32,16 @@ public class RestExceptionHandling {
                     .message(CustomException.getMessage())
                     .httpStatusCode(CustomException.getHttpStatusCode() != null
                             ? CustomException.getHttpStatusCode().value()
-                            : status.value())
+                            : HttpStatus.BAD_REQUEST.value())
                     .build();
             if (StringUtils.isNotBlank(CustomException.getMessage())) {
                 log.error(CustomException.getMessage());
             }
 
-            return new ResponseEntity<>(errorResponse, status);
+            return new ResponseEntity<>(errorResponse,
+                    CustomException.getHttpStatusCode() != null
+                            ? CustomException.getHttpStatusCode()
+                            : HttpStatus.BAD_REQUEST);
         }
         errorResponse = ErrorResponse.builder()
                 .code("ERROR")
