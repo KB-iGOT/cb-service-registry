@@ -18,11 +18,13 @@ public class RestExceptionHandling {
         ErrorResponse errorResponse = null;
         if (ex instanceof CustomException) {
             CustomException CustomException = (com.igot.service_locator.exceptions.CustomException) ex;
-            status = HttpStatus.BAD_REQUEST;
+            HttpStatus customStatus = HttpStatus.BAD_REQUEST;
             // Check if the CustomException provides an HTTP status code
             if (CustomException != null) {
                 try {
-                    status = CustomException.getHttpStatusCode();
+                    if (CustomException.getHttpStatusCode() != null) {
+                        customStatus = CustomException.getHttpStatusCode();
+                    }
                 } catch (IllegalArgumentException e) {
                     log.warn("Invalid HTTP status code provided in CustomException: " + CustomException.getHttpStatusCode());
                 }
@@ -30,18 +32,13 @@ public class RestExceptionHandling {
             errorResponse = ErrorResponse.builder()
                     .code(CustomException.getCode())
                     .message(CustomException.getMessage())
-                    .httpStatusCode(CustomException.getHttpStatusCode() != null
-                            ? CustomException.getHttpStatusCode().value()
-                            : HttpStatus.BAD_REQUEST.value())
+                    .httpStatusCode(customStatus.value())
                     .build();
             if (StringUtils.isNotBlank(CustomException.getMessage())) {
                 log.error(CustomException.getMessage());
             }
 
-            return new ResponseEntity<>(errorResponse,
-                    CustomException.getHttpStatusCode() != null
-                            ? CustomException.getHttpStatusCode()
-                            : HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(errorResponse, customStatus);
         }
         errorResponse = ErrorResponse.builder()
                 .code("ERROR")
