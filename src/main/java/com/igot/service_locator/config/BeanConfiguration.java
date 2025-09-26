@@ -1,6 +1,8 @@
 package com.igot.service_locator.config;
 
 
+import org.apache.hc.client5.http.config.ConnectionConfig;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.apache.hc.client5.http.config.RequestConfig;
@@ -17,7 +19,6 @@ import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactor
 import org.springframework.data.redis.connection.lettuce.LettucePoolingClientConfiguration;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
-import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
@@ -47,14 +48,17 @@ public class BeanConfiguration {
         int connectionRequestTimeoutMs = 2000;
         int responseTimeoutMs = 45000;
         RequestConfig config = RequestConfig.custom().
-                setConnectTimeout(Timeout.ofMilliseconds(connectTimeoutMs)).
                 setConnectionRequestTimeout(Timeout.ofMilliseconds(connectionRequestTimeoutMs)).
                 setResponseTimeout(Timeout.ofMilliseconds(responseTimeoutMs)).
                 build();
 
-        PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
-        connectionManager.setMaxTotal(2000);
-        connectionManager.setDefaultMaxPerRoute(500);
+        PoolingHttpClientConnectionManager connectionManager = PoolingHttpClientConnectionManagerBuilder.create()
+                .setDefaultConnectionConfig(ConnectionConfig.custom()
+                        .setConnectTimeout(Timeout.ofMilliseconds(connectTimeoutMs))
+                        .build())
+                .setMaxConnTotal(2000)
+                .setMaxConnPerRoute(500)
+                .build();
 
         CloseableHttpClient client = HttpClients.custom()
                 .setDefaultRequestConfig(config)
