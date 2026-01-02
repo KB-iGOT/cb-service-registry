@@ -21,17 +21,18 @@ import java.util.Map;
 
 @Component
 @Slf4j
-public class AuthPluginService{
+public class AuthPluginService {
 
     private final ObjectMapper objectMapper;
     private final CbServerProperties cbServerProperties;
     private final CallExternalService callExternalService;
     private final DataTransformUtility dataTransformUtility;
+    private static final String CLIENT_CODE = "clientCode";
 
     public AuthPluginService(ObjectMapper objectMapper,
-                             CbServerProperties cbServerProperties,
-                             CallExternalService callExternalService,
-                             DataTransformUtility dataTransformUtility) {
+            CbServerProperties cbServerProperties,
+            CallExternalService callExternalService,
+            DataTransformUtility dataTransformUtility) {
         this.objectMapper = objectMapper;
         this.cbServerProperties = cbServerProperties;
         this.callExternalService = callExternalService;
@@ -39,7 +40,7 @@ public class AuthPluginService{
     }
 
     public String generateAuthHeader(JsonNode jsonNode) {
-        if(jsonNode.has("clientAuthUrl")&&jsonNode.has("clientCredentials")) {
+        if (jsonNode.has("clientAuthUrl") && jsonNode.has("clientCredentials")) {
             log.info("CourseraPluginServiceImpl::generateAuthHeader");
             IntegrationFrameworkDto dto = new IntegrationFrameworkDto();
             Map<String, String> requestHeader = new HashMap<>();
@@ -61,9 +62,10 @@ public class AuthPluginService{
             JsonNode jsonResponse = objectMapper.convertValue(response, new TypeReference<JsonNode>() {
             });
             return "Bearer " + jsonResponse.path("responseData").get("access_token").asText();
-        }else if(jsonNode.has("clientSegment")&&jsonNode.has("clientCode")&&jsonNode.has("clientSecret")) {
+        } else if (jsonNode.has("clientSegment") && jsonNode.has(CLIENT_CODE) && jsonNode.has("clientSecret")) {
             String timestamp = String.valueOf(System.currentTimeMillis());
-            String toHash = jsonNode.get("clientSegment").asText() + jsonNode.get("clientCode").asText() + timestamp + jsonNode.get("clientSecret").asText();
+            String toHash = jsonNode.get("clientSegment").asText() + jsonNode.get(CLIENT_CODE).asText() + timestamp
+                    + jsonNode.get("clientSecret").asText();
             MessageDigest md = null;
             try {
                 md = MessageDigest.getInstance("MD5");
@@ -81,7 +83,7 @@ public class AuthPluginService{
                 hashString.append(String.format("%02x", b));
             }
             String authHash = hashString.toString();
-            return jsonNode.get("clientCode").asText() + "." + timestamp + "." + authHash;
+            return jsonNode.get(CLIENT_CODE).asText() + "." + timestamp + "." + authHash;
         }
         return "";
     }

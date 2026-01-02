@@ -1,6 +1,7 @@
 package com.igot.service_locator.controller;
 
 import com.igot.service_locator.dto.PaginatedRequestDto;
+import com.igot.service_locator.dto.PaginatedResponse;
 import com.igot.service_locator.dto.ServiceLocatorDto;
 import com.igot.service_locator.entity.ServiceLocatorEntity;
 import com.igot.service_locator.service.ServiceLocatorService;
@@ -19,7 +20,6 @@ public class ServiceLocatorController {
     @Autowired
     private ServiceLocatorService serviceLocatorService;
 
-
     @PostMapping("/config/create")
     public ServiceLocatorEntity createServiceConfig(@RequestBody ServiceLocatorEntity serviceLocatorEntity) {
         return serviceLocatorService.createOrUpdateServiceConfig(serviceLocatorEntity);
@@ -29,7 +29,6 @@ public class ServiceLocatorController {
     public ServiceLocatorEntity updateServiceConfig(@RequestBody ServiceLocatorEntity serviceLocatorEntity) {
         return serviceLocatorService.createOrUpdateServiceConfig(serviceLocatorEntity);
     }
-
 
     @DeleteMapping("/config/delete/{id}")
     public String deleteServiceConfig(@PathVariable String id) {
@@ -43,14 +42,14 @@ public class ServiceLocatorController {
     }
 
     @PostMapping("/config/fetch")
-    public ResponseEntity<?> getAllServiceConfig(@RequestBody PaginatedRequestDto dto){
+    public ResponseEntity<PaginatedResponse> getAllServiceConfig(@RequestBody PaginatedRequestDto dto) {
         return ResponseEntity.ok(serviceLocatorService.getAllServiceConfig(dto));
     }
 
     @GetMapping("/config/read/{id}")
-    public ResponseEntity<?> readServiceConfig(@PathVariable String id, @RequestParam(value = "isActive", defaultValue = "true") boolean isActive) {
+    public ResponseEntity<ServiceLocatorEntity> readServiceConfig(@PathVariable String id,
+            @RequestParam(value = "isActive", defaultValue = "true") boolean isActive) {
         return ResponseEntity.ok(serviceLocatorService.readServiceConfig(id, isActive));
     }
-
 
 }
