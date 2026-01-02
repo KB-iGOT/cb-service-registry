@@ -44,7 +44,7 @@ class ServiceLocatorControllerTest {
         PaginatedResponse expected = new PaginatedResponse();
         when(serviceLocatorService.getAllServiceConfig(dto)).thenReturn(expected);
 
-        ResponseEntity<?> response = controller.getAllServiceConfig(dto);
+        ResponseEntity<PaginatedResponse> response = controller.getAllServiceConfig(dto);
 
         assertEquals(ResponseEntity.ok(expected), response);
         verify(serviceLocatorService).getAllServiceConfig(dto);
@@ -84,7 +84,6 @@ class ServiceLocatorControllerTest {
         verify(serviceLocatorService).searchServiceConfig(dto);
     }
 
-
     @Test
     void testReadServiceConfig_withIsActiveTrue() {
         String id = "123";
@@ -92,7 +91,7 @@ class ServiceLocatorControllerTest {
         ServiceLocatorEntity expected = ServiceLocatorEntity.builder().build();
         when(serviceLocatorService.readServiceConfig(id, isActive)).thenReturn(expected);
 
-        ResponseEntity<?> response = controller.readServiceConfig(id, isActive);
+        ResponseEntity<ServiceLocatorEntity> response = controller.readServiceConfig(id, isActive);
 
         assertEquals(ResponseEntity.ok(expected), response);
         verify(serviceLocatorService).readServiceConfig(id, isActive);
@@ -105,7 +104,7 @@ class ServiceLocatorControllerTest {
         ServiceLocatorEntity expected = ServiceLocatorEntity.builder().build();
         when(serviceLocatorService.readServiceConfig(id, isActive)).thenReturn(expected);
 
-        ResponseEntity<?> response = controller.readServiceConfig(id, isActive);
+        ResponseEntity<ServiceLocatorEntity> response = controller.readServiceConfig(id, isActive);
 
         assertEquals(ResponseEntity.ok(expected), response);
         verify(serviceLocatorService).readServiceConfig(id, isActive);
