@@ -42,8 +42,9 @@ public class ServiceLocatorController {
     }
 
     @PostMapping("/config/fetch")
-    public ResponseEntity<Object> getAllServiceConfig(@RequestBody PaginatedRequestDto dto) {
-        return ResponseEntity.ok(serviceLocatorService.getAllServiceConfig(dto));
+    public ResponseEntity<PaginatedResponse<Object>> getAllServiceConfig(@RequestBody PaginatedRequestDto dto) {
+        PaginatedResponse<Object> response = serviceLocatorService.getAllServiceConfig(dto);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/config/read/{id}")

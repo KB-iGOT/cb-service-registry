@@ -142,7 +142,7 @@ public class ServiceLocatorServiceImpl implements ServiceLocatorService {
 
 
     @Override
-    public PaginatedResponse getAllServiceConfig(PaginatedRequestDto dto) {
+    public PaginatedResponse<Object> getAllServiceConfig(PaginatedRequestDto dto) {
         try {
             Pageable pageable = PageRequest.of(dto.getOffset(), dto.getLimit());
             Page<Object> pageData = null;

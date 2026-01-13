@@ -44,7 +44,7 @@ class ServiceLocatorControllerTest {
         PaginatedResponse expected = new PaginatedResponse();
         when(serviceLocatorService.getAllServiceConfig(dto)).thenReturn(expected);
 
-        ResponseEntity<PaginatedResponse> response = controller.getAllServiceConfig(dto);
+        ResponseEntity<PaginatedResponse<Object>> response = controller.getAllServiceConfig(dto);
 
         assertEquals(ResponseEntity.ok(expected), response);
         verify(serviceLocatorService).getAllServiceConfig(dto);

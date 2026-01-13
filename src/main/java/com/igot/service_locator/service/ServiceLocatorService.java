@@ -14,7 +14,7 @@ public interface ServiceLocatorService {
 
   List<ServiceLocatorEntity> searchServiceConfig(ServiceLocatorDto serviceLocatorDto);
 
-  PaginatedResponse getAllServiceConfig(PaginatedRequestDto dto);
+  PaginatedResponse<Object> getAllServiceConfig(PaginatedRequestDto dto);
 
   ServiceLocatorEntity readServiceConfig(String id,boolean isActive);
 
