@@ -42,7 +42,7 @@ public class ServiceLocatorController {
     }
 
     @PostMapping("/config/fetch")
-    public ResponseEntity<PaginatedResponse> getAllServiceConfig(@RequestBody PaginatedRequestDto dto) {
+    public ResponseEntity<Object> getAllServiceConfig(@RequestBody PaginatedRequestDto dto) {
         return ResponseEntity.ok(serviceLocatorService.getAllServiceConfig(dto));
     }
 
