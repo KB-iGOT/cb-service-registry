@@ -13,8 +13,11 @@ import java.io.IOException;
 @Slf4j
 public class IntegrationController {
 
-    @Autowired
     IntegrationModelService service;
+
+    public IntegrationController(IntegrationModelService service) {
+        this.service = service;
+    }
 
     @PostMapping("/v1/callExternalApi")
     public Object callExternalApiService(@RequestBody IntegrationModel integrationModel) throws IOException {

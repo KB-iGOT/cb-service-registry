@@ -15,33 +15,31 @@ import com.igot.service_locator.util.IntegrationFrameworkUtil;
 import com.igot.service_locator.util.IntegrationModelValidator;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 @Slf4j
 public class IntegrationModelServiceImpl implements IntegrationModelService {
 
-    @Autowired
-    private ServiceLocatorRepository serviceLocatorRepository;
+    private final ServiceLocatorRepository serviceLocatorRepository;
+    private final IntegrationFrameworkUtil integrationFrameworkUtil;
+    private final ObjectMapper mapper;
+    private final IntegrationModelValidator modelValidator;
+    private final ServiceLocatorService serviceLocatorService;
 
-    @Autowired
-    private IntegrationFrameworkUtil integrationFrameworkUtil;
-
-    @Autowired
-    private ObjectMapper mapper;
-
-    @Autowired
-    private IntegrationModelValidator modelValidator;
-
-    @Autowired
-    private ServiceLocatorService serviceLocatorService;
+    public IntegrationModelServiceImpl(ServiceLocatorRepository serviceLocatorRepository, IntegrationFrameworkUtil integrationFrameworkUtil,
+    ObjectMapper mapper, IntegrationModelValidator modelValidator, ServiceLocatorService serviceLocatorService) {
+        this.serviceLocatorRepository = serviceLocatorRepository;
+        this.integrationFrameworkUtil = integrationFrameworkUtil;
+        this.mapper = mapper;
+        this.modelValidator = modelValidator;
+        this.serviceLocatorService = serviceLocatorService;
+    }
 
 
     @Override

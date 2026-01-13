@@ -19,7 +19,7 @@ class IntegrationControllerTest {
     @BeforeEach
     void setUp() {
         service = mock(IntegrationModelService.class);
-        controller = new IntegrationController();
+        controller = new IntegrationController(service);
         controller.service = service;
     }
 
