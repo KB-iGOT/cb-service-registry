@@ -26,15 +26,13 @@ import java.util.Map;
 @Slf4j
 public class IntegrationModelServiceImpl implements IntegrationModelService {
 
-    private final ServiceLocatorRepository serviceLocatorRepository;
     private final IntegrationFrameworkUtil integrationFrameworkUtil;
     private final ObjectMapper mapper;
     private final IntegrationModelValidator modelValidator;
     private final ServiceLocatorService serviceLocatorService;
 
-    public IntegrationModelServiceImpl(ServiceLocatorRepository serviceLocatorRepository, IntegrationFrameworkUtil integrationFrameworkUtil,
+    public IntegrationModelServiceImpl(IntegrationFrameworkUtil integrationFrameworkUtil,
     ObjectMapper mapper, IntegrationModelValidator modelValidator, ServiceLocatorService serviceLocatorService) {
-        this.serviceLocatorRepository = serviceLocatorRepository;
         this.integrationFrameworkUtil = integrationFrameworkUtil;
         this.mapper = mapper;
         this.modelValidator = modelValidator;
