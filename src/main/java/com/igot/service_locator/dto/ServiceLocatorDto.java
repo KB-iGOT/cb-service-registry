@@ -1,6 +1,5 @@
 package com.igot.service_locator.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import java.util.List;
@@ -14,7 +13,7 @@ import java.util.List;
 public class ServiceLocatorDto {
   private List<String> ids;
   private String url;
-  private String ServiceCode;
+  private String serviceCode;
   private String  serviceName;
   private String operationType;
   private Boolean active;

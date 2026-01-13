@@ -17,8 +17,11 @@ import java.util.List;
 @Slf4j
 public class ServiceLocatorController {
 
-    @Autowired
-    private ServiceLocatorService serviceLocatorService;
+    private final ServiceLocatorService serviceLocatorService;
+
+    public ServiceLocatorController(ServiceLocatorService serviceLocatorService) {
+        this.serviceLocatorService = serviceLocatorService;
+    }
 
     @PostMapping("/config/create")
     public ServiceLocatorEntity createServiceConfig(@RequestBody ServiceLocatorEntity serviceLocatorEntity) {
